@@ -32,10 +32,11 @@ sourceSets.main.resources.srcDir "$buildDir/generated/mod/resources"
 compileJava.dependsOn generate
 processResources.dependsOn generate
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+tasks.withType(Jar).configureEach { preserveFileTimestamps = false; reproducibleFileOrder = true }
 if (tasks.findByName('sourcesJar') != null) tasks.named('sourcesJar').configure { dependsOn generate }
 // Development utilities are never jar contents or production dependencies.
 def withDevMods = findProperty('devMods') != 'false'
-if (withDevMods) {
+def addDevMods = { if (withDevMods) {
     def lock = new JsonSlurper().parse(new File(workspace, 'dev-mods.lock.json'))[projectDir.name]
     dependencies {
         lock.dependencies.each { dep ->
@@ -46,4 +47,8 @@ if (withDevMods) {
             } else runtimeOnly dep.coordinate
         }
     }
-}
+} }
+// ModDev creates the remapped localRuntime configuration below the shared script.
+// ForgeGradle resolves its obfuscated graph during afterEvaluate, so populate it now.
+if (config.minecraft == '1.20.1') afterEvaluate { addDevMods() }
+else addDevMods()

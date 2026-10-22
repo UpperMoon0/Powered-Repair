@@ -48,6 +48,11 @@ jobs:
         run: chmod +x gradlew && ./gradlew build -PdevMods=false --no-daemon --console=plain
       - name: Validate production JAR
         run: python tools/release.py inspect '${{ matrix.target }}'
+      - name: Native repair acceptance with development utilities
+        timeout-minutes: 15
+        env:
+          DEV_SMOKE: 'true'
+        run: python tools/smoke.py '${{ matrix.target }}'
       - uses: actions/upload-artifact@v4
         with:
           name: mod-${{ matrix.target }}
@@ -62,3 +67,5 @@ jobs:
           path: |
             ${{ matrix.target }}/build/reports/
             ${{ matrix.target }}/build/neoform/
+            ${{ matrix.target }}/run/logs/
+            ${{ matrix.target }}/run/crash-reports/

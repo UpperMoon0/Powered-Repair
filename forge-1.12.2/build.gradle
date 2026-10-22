@@ -4,6 +4,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'java-library'
+apply from: '../gradle/forge-1122-merge.gradle'
 apply from: '../gradle/module.gradle'
 sourceCompatibility = targetCompatibility = '1.8'
 minecraft {

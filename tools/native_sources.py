@@ -235,11 +235,19 @@ import {ns}.items.wrapper.SidedInvWrapper;'''
     result = {'RepairMod.java':mod, 'RepairBlock.java':block, 'RepairMachine.java':machine}
     for key, value in replacements.items():
         result = {name:text.replace('@'+key+'@',value) for name,text in result.items()}
+    if not cfg.get('_skipSmoke'):
+        from smoke_sources import modern_probe
+        result['NativeSmoke.java'] = modern_probe(cfg)
+        hook = f'{ns}.common.NeoForge.EVENT_BUS.addListener(NativeSmoke::run);' if neo else 'net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(NativeSmoke::run);'
+        result['RepairMod.java'] = result['RepairMod.java'].replace('BLOCKS.register(bus);',
+            'if ("1".equals(System.getenv("POWERED_REPAIR_SMOKE"))) { '+hook+' }\n        BLOCKS.register(bus);')
     return result
 
 def legacy116(cfg):
     # Official 1.16.5 mappings retain older package/class names. Keep gameplay methods identical.
-    result = modern(dict(cfg, minecraft='1.20.1'))
+    result = modern(dict(cfg, minecraft='1.20.1', _skipSmoke=True))
+    from smoke_sources import modern_probe
+    result['NativeSmoke.java'] = modern_probe(dict(cfg, minecraft='1.20.1'))
     replacements = {
         'net.minecraft.core.BlockPos':'net.minecraft.util.math.BlockPos',
         'net.minecraft.core.Direction':'net.minecraft.util.Direction',
@@ -310,4 +318,19 @@ def legacy116(cfg):
               .replace('ForgeRegistries.BLOCK_ENTITY_TYPES', 'ForgeRegistries.TILE_ENTITIES')
               .replace('import net.minecraft.tileentity.TileEntity;', 'import net.minecraft.tileentity.TileEntity;\nimport net.minecraft.tileentity.ITickableTileEntity;')
               for name, text in result.items()}
+    smoke = result['NativeSmoke.java']
+    smoke = smoke.replace('net.minecraftforge.event.server.ServerStartedEvent', 'net.minecraftforge.fml.event.server.FMLServerStartedEvent').replace('ServerStartedEvent event', 'FMLServerStartedEvent event')
+    for name, kind in {'level':'net.minecraft.world.server.ServerWorld', 'pos':'BlockPos', 'machine':'RepairMachine',
+                       'tool':'ItemStack', 'energy':'net.minecraftforge.energy.IEnergyStorage',
+                       'saved':'net.minecraft.nbt.CompoundNBT', 'restored':'TileEntity', 'loaded':'RepairMachine'}.items():
+        smoke = smoke.replace('var '+name+' ',kind+' '+name+' ')
+        smoke = smoke.replace('var '+name+'=',kind+' '+name+'=')
+    smoke = smoke.replace('machine.saveWithFullMetadata()', 'machine.save(new net.minecraft.nbt.CompoundNBT())')
+    smoke = smoke.replace('tool.setHoverName(net.minecraft.util.text.ITextComponent.literal("Preserved name"));', 'tool.setHoverName(new net.minecraft.util.text.StringTextComponent("Preserved name"));')
+    smoke = smoke.replace('TileEntity.loadStatic(pos,machine.getBlockState(),saved)', 'TileEntity.loadStatic(machine.getBlockState(),saved)')
+    smoke = smoke.replace('net.minecraftforge.common.capabilities.CapabilityEnergy', 'net.minecraftforge.energy.CapabilityEnergy').replace('net.minecraftforge.common.capabilities.CapabilityItemHandler', 'net.minecraftforge.items.CapabilityItemHandler')
+    smoke = smoke.replace('NATIVE_REPAIR_SMOKE_PASS 1.20.1', 'NATIVE_REPAIR_SMOKE_PASS 1.16.5').replace('NATIVE_REPAIR_SMOKE_FAIL 1.20.1', 'NATIVE_REPAIR_SMOKE_FAIL 1.16.5')
+    result['NativeSmoke.java'] = smoke
+    result['RepairMod.java'] = result['RepairMod.java'].replace('BLOCKS.register(bus);',
+        'if ("1".equals(System.getenv("POWERED_REPAIR_SMOKE"))) net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(NativeSmoke::run);\n        BLOCKS.register(bus);')
     return result

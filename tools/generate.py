@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import re
+import shutil
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,6 +18,10 @@ def generate(target):
     if not re.fullmatch('[a-z][a-z0-9_]{1,63}', mod):
         raise ValueError('mod_id must be a lowercase loader-safe identifier')
     out = ROOT / target / 'build/generated/mod'
+    if out.exists():
+        if out.resolve().relative_to((ROOT / target / 'build/generated').resolve()) != Path('mod'):
+            raise ValueError('Generated output escaped its module build directory')
+        shutil.rmtree(out)
     def write(path, value):
         path = out / path
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -37,7 +42,7 @@ def generate(target):
     resource(f'assets/{mod}/models/block/repair_station.json', {
         'parent': 'minecraft:block/cube', 'textures': {
             'particle': f'minecraft:{texture_root}/iron_block', 'down': f'minecraft:{texture_root}/iron_block',
-            'up': f'minecraft:{texture_root}/anvil_top', 'north': f'minecraft:{texture_root}/redstone_block',
+            'up': f'minecraft:{texture_root}/' + ('anvil_top_damaged_0' if family == '112' else 'anvil_top'), 'north': f'minecraft:{texture_root}/redstone_block',
             'east': f'minecraft:{texture_root}/iron_block', 'south': f'minecraft:{texture_root}/redstone_block',
             'west': f'minecraft:{texture_root}/iron_block'}})
     resource(f'assets/{mod}/models/item/repair_station.json', {'parent': f'{mod}:block/repair_station'})

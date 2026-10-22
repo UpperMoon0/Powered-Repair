@@ -53,7 +53,7 @@ Use `gradlew.bat` on Windows. `tools/build.py` honors `JAVA_HOME_8_X64`, `JAVA_H
 
 ## CI and releases
 
-Every push and pull request runs shared tests, cross-version resource/package checks, and builds all six loader artifacts. Release tags use `v<mod_version>` and must match `gradle.properties`. The release workflow waits for the full build matrix before creating a draft GitHub release and uploading to CurseForge. It publishes the GitHub release after all six CurseForge uploads return confirmed file IDs.
+Every push and pull request runs shared tests, cross-version resource/package checks, and builds all six loader artifacts. Each target also runs native server acceptance checks with the locked development utilities: capability lookup, simulation/rollback, repair cost, redstone pause, item data preservation, saved-block reload, and extraction after completion. Release tags use `v<mod_version>` and must match `gradle.properties`. The release workflow waits for the full build matrix before creating a draft GitHub release and uploading to CurseForge. It publishes the GitHub release after all six CurseForge uploads return confirmed file IDs.
 
 Before the first release:
 

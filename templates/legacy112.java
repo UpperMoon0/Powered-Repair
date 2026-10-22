@@ -40,6 +40,39 @@ public final class RepairMod {
     }
     @SubscribeEvent public static void blocks(RegistryEvent.Register<Block> event) { event.getRegistry().register(BLOCK); }
     @SubscribeEvent public static void items(RegistryEvent.Register<Item> event) { event.getRegistry().register(new ItemBlock(BLOCK).setRegistryName(BLOCK.getRegistryName())); }
+    @Mod.EventHandler public void started(net.minecraftforge.fml.common.event.FMLServerStartedEvent event) {
+        if (!"1".equals(System.getenv("POWERED_REPAIR_SMOKE"))) return;
+        net.minecraft.server.MinecraftServer server=net.minecraftforge.fml.common.FMLCommonHandler.instance().getMinecraftServerInstance();
+        try {
+            World world=server.getWorld(0); BlockPos pos=new BlockPos(0,90,0);
+            world.setBlockState(pos,BLOCK.getDefaultState());
+            Machine machine=(Machine)world.getTileEntity(pos);
+            if(machine==null) throw new AssertionError("block entity registration");
+            ItemStack tool=new ItemStack(net.minecraft.init.Items.DIAMOND_PICKAXE);
+            tool.setItemDamage(10); tool.setStackDisplayName("Preserved name"); machine.setInventorySlotContents(0,tool);
+            if(!machine.canInsertItem(1,tool,EnumFacing.UP) || machine.canExtractItem(0,tool,EnumFacing.DOWN)) throw new AssertionError("automation rules");
+            IEnergyStorage energy=machine.getCapability(CapabilityEnergy.ENERGY,EnumFacing.NORTH);
+            if(energy==null || !machine.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,EnumFacing.DOWN)) throw new AssertionError("native capabilities");
+            energy.receiveEnergy(1000,true);
+            if(machine.power.stored()!=0) throw new AssertionError("energy simulation");
+            energy.receiveEnergy(1000,false);
+            if(energy.extractEnergy(100,false)!=0) throw new AssertionError("receive only");
+            world.setBlockState(pos.east(),net.minecraft.init.Blocks.REDSTONE_BLOCK.getDefaultState());
+            machine.update();
+            if(tool.getItemDamage()!=10 || machine.power.stored()!=1000) throw new AssertionError("redstone pause");
+            world.setBlockToAir(pos.east()); machine.update();
+            if(tool.getItemDamage()!=9 || machine.power.stored()!=900 || !tool.getDisplayName().equals("Preserved name")) throw new AssertionError("repair accounting and item data");
+            TileEntity restored=TileEntity.create(world,machine.writeToNBT(new NBTTagCompound()));
+            if(!(restored instanceof Machine)) throw new AssertionError("saved block entity factory");
+            Machine loaded=(Machine)restored;
+            if(loaded.power.stored()!=900 || loaded.getStackInSlot(0).getItemDamage()!=9 || !loaded.getStackInSlot(0).getDisplayName().equals("Preserved name")) throw new AssertionError("saved energy and item data");
+            for(int i=0;i<9;i++) machine.update();
+            if(tool.getItemDamage()!=0 || !machine.canExtractItem(0,tool,EnumFacing.DOWN)) throw new AssertionError("completion extraction");
+            java.nio.file.Files.write(java.nio.file.Paths.get("repair-smoke-result.txt"),"NATIVE_REPAIR_SMOKE_PASS 1.12.2".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            System.out.println("NATIVE_REPAIR_SMOKE_PASS 1.12.2");
+        } catch(Throwable error) { error.printStackTrace(); System.err.println("NATIVE_REPAIR_SMOKE_FAIL 1.12.2"); }
+        finally { server.initiateShutdown(); }
+    }
     @Mod.EventBusSubscriber(modid=RepairMod.ID, value=net.minecraftforge.fml.relauncher.Side.CLIENT)
     public static final class Client {
         @SubscribeEvent public static void models(net.minecraftforge.client.event.ModelRegistryEvent event) {

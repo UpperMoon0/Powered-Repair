@@ -42,6 +42,21 @@ class WorkspaceTests(unittest.TestCase):
             self.assertIn('@ID@',text)
             self.assertNotIn('powered_repair',text)
 
+    def test_renaming_removes_old_generated_resources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            text=(generate.ROOT/'gradle.properties').read_text()
+            (root/'gradle.properties').write_text(text)
+            (root/'targets.json').write_text((generate.ROOT/'targets.json').read_text())
+            with patch.object(generate,'ROOT',root):
+                generate.generate('forge-1.20.1')
+                old=generate.properties()['mod_id']
+                (root/'gradle.properties').write_text(text.replace('mod_id='+old,'mod_id=renamed_repair'))
+                generate.generate('forge-1.20.1')
+                out=root/'forge-1.20.1/build/generated/mod/resources'
+                self.assertFalse((out/'assets'/old).exists())
+                self.assertTrue((out/'assets/renamed_repair').is_dir())
+
     def test_release_is_blocked_for_provisional_identity(self):
         with patch.object(release,'properties',return_value={'identity_final':'false'}):
             with self.assertRaisesRegex(ValueError,'final mod ID'):
