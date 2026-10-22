@@ -1,0 +1,9 @@
+plugins { id 'java-library'; id 'net.neoforged.moddev.legacyforge' version '2.0.148' }
+apply from: '../gradle/module.gradle'
+legacyForge {
+    version = '1.20.1-47.3.12'
+    runs { client { client() }; server { server(); programArgument '--nogui' } }
+    mods { "${identity.mod_id}" { sourceSet(sourceSets.main) } }
+}
+configurations { runtimeClasspath.extendsFrom localRuntime }
+obfuscation { createRemappingConfiguration(configurations.localRuntime) }

@@ -1,0 +1,12 @@
+plugins { id 'java-library'; id 'net.minecraftforge.gradle' version '6.0.42' }
+apply from: '../gradle/module.gradle'
+minecraft {
+    mappings channel:'official', version:'1.16.5'
+    copyIdeResources = true
+    runs {
+        client { workingDirectory project.file('run'); mods { "${identity.mod_id}" { source sourceSets.main } } }
+        server { workingDirectory project.file('run'); args '--nogui'; mods { "${identity.mod_id}" { source sourceSets.main } } }
+    }
+}
+dependencies { minecraft 'net.minecraftforge:forge:1.16.5-36.2.42' }
+jar { finalizedBy 'reobfJar' }

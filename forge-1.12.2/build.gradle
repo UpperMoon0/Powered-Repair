@@ -1,0 +1,17 @@
+buildscript {
+    repositories { maven { url='https://maven.minecraftforge.net/' }; mavenCentral() }
+    dependencies { classpath 'net.minecraftforge.gradle:ForgeGradle:3.0.197' }
+}
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'java-library'
+apply from: '../gradle/module.gradle'
+sourceCompatibility = targetCompatibility = '1.8'
+minecraft {
+    mappings channel:'stable', version:'39-1.12'
+    runs {
+        client { workingDirectory project.file('run'); forceExit false }
+        server { workingDirectory project.file('run'); args 'nogui'; forceExit false }
+    }
+}
+dependencies { minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2864' }
+jar { finalizedBy 'reobfJar' }

@@ -1,0 +1,8 @@
+{
+  "forge-1.12.2": {"minecraft":"1.12.2","loader":"forge","loaderVersion":"14.23.5.2864","java":8,"gradle":"5.6.4","pack":3},
+  "forge-1.16.5": {"minecraft":"1.16.5","loader":"forge","loaderVersion":"36.2.42","java":8,"gradle":"8.8","pack":6},
+  "forge-1.20.1": {"minecraft":"1.20.1","loader":"forge","loaderVersion":"47.3.12","java":17,"gradle":"8.14.3","pack":15},
+  "neoforge-1.21.1": {"minecraft":"1.21.1","loader":"neoforge","loaderVersion":"21.1.240","java":21,"gradle":"8.14.3","pack":34},
+  "neoforge-26.1.2": {"minecraft":"26.1.2","loader":"neoforge","loaderVersion":"26.1.2.116","java":25,"gradle":"9.2.1","pack":84},
+  "neoforge-26.2": {"minecraft":"26.2","loader":"neoforge","loaderVersion":"26.2.0.93","java":25,"gradle":"9.2.1","pack":84}
+}

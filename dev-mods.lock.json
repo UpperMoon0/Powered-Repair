@@ -1,0 +1,198 @@
+{
+  "forge-1.12.2": {
+    "dependencies": [
+      {
+        "project": "jei",
+        "version": "4.22.0.1037",
+        "coordinate": "maven.modrinth:jei:fktQZbF6",
+        "filename": "jei_1.12.2-4.22.0.1037.jar",
+        "sha512": "3fde06850308ee488eaae1b36b04e46ed23612f89dcf0485866488c72cc9eea552f3b6e5e340d84f865043eea4aa61c0d36d1d2358f0712c7c94458bd3ed79cb",
+        "url": "https://cdn.modrinth.com/data/u6dRKJwZ/versions/fktQZbF6/jei_1.12.2-4.22.0.1037.jar"
+      }
+    ],
+    "unavailable": [
+      "powah: no compatible upstream release"
+    ]
+  },
+  "forge-1.16.5": {
+    "dependencies": [
+      {
+        "project": "jei",
+        "version": "7.8.1.1019",
+        "coordinate": "maven.modrinth:jei:cdOvD10v",
+        "filename": "jei-1.16.5-7.8.1.1019.jar",
+        "sha512": "034328820cdf86724a5efbdb7889f4b82a51a7df06c8351266069e6fa80783330a4c36d0e974ecb0b2f6f68dcffef8f9198854a67445e02878f90addd0411b4b",
+        "url": "https://cdn.modrinth.com/data/u6dRKJwZ/versions/cdOvD10v/jei-1.16.5-7.8.1.1019.jar"
+      },
+      {
+        "project": "powah",
+        "version": "2.3.16",
+        "coordinate": "curse.maven:powah-352656:3232535"
+      },
+      {
+        "project": "lollipop",
+        "version": "3.2.9",
+        "coordinate": "curse.maven:lollipop-347954:3232534"
+      }
+    ],
+    "unavailable": []
+  },
+  "forge-1.20.1": {
+    "dependencies": [
+      {
+        "project": "jei",
+        "version": "15.74.0.228",
+        "coordinate": "maven.modrinth:jei:MoqLPMQn",
+        "filename": "jei-1.20.1-forge-15.74.0.228.jar",
+        "sha512": "b1857713e9d5fa2a232452480c9ed661abd988c03d897bb6331d471172f9f873cb5234ff9639880d0bc5483423323efb350a5cd8ba7cda00066327c3794a301a",
+        "url": "https://cdn.modrinth.com/data/u6dRKJwZ/versions/MoqLPMQn/jei-1.20.1-forge-15.74.0.228.jar"
+      },
+      {
+        "project": "7tEfOcA7",
+        "version": "0.6.8",
+        "coordinate": "maven.modrinth:7tEfOcA7:EAG7rQQs",
+        "filename": "mezz_config-1.20.1-forge-0.6.8.jar",
+        "sha512": "6e60ca9410fe80b8a61c2da755c4a540b1623ad4dc79d9372d7cb5ad0ba669ffead6e32a8e2d93fdc8e3a7a0a12fee6abd31b194d8ae902ef0462d730bd2270c",
+        "url": "https://cdn.modrinth.com/data/7tEfOcA7/versions/EAG7rQQs/mezz_config-1.20.1-forge-0.6.8.jar"
+      },
+      {
+        "project": "powah",
+        "version": "5.0.11-forge",
+        "coordinate": "maven.modrinth:powah:xDOvxyqP",
+        "filename": "Powah-5.0.11.jar",
+        "sha512": "c9cf605e5598cfeda4392fe546f5cd541be8ac6fc02525cc23b0780aff7b8c40bb6a6fa572c70aea94428e7f69ff7cf64a1abded03e311c20c150d2f6c30fe6f",
+        "url": "https://cdn.modrinth.com/data/KZO4S4DO/versions/xDOvxyqP/Powah-5.0.11.jar"
+      },
+      {
+        "project": "9s6osm5g",
+        "version": "11.1.136+forge",
+        "coordinate": "maven.modrinth:9s6osm5g:t8TXrZvZ",
+        "filename": "cloth-config-11.1.136-forge.jar",
+        "sha512": "137c4af99c53d77317cbfb1cc8c49fc2761708b49d1992f51fd846960df41dde3a83519c987e081508d4ed90c603566f3d5a6cb620ad9d85b8f4de59aa9115ef",
+        "url": "https://cdn.modrinth.com/data/9s6osm5g/versions/t8TXrZvZ/cloth-config-11.1.136-forge.jar"
+      },
+      {
+        "project": "lhGA9TYQ",
+        "version": "9.2.14+forge",
+        "coordinate": "maven.modrinth:lhGA9TYQ:1MKTLiiG",
+        "filename": "architectury-9.2.14-forge.jar",
+        "sha512": "cf67f2050cafa00f0bee42e6d7bef77fdb808ac4f71742f7b4d6d5c1e6ffb49561a5a252f332d2b78a9767bdb5faa284611790dba303fbdc736ae36d794f61c7",
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/1MKTLiiG/architectury-9.2.14-forge.jar"
+      }
+    ],
+    "unavailable": []
+  },
+  "neoforge-1.21.1": {
+    "dependencies": [
+      {
+        "project": "jei",
+        "version": "19.69.0.457",
+        "coordinate": "maven.modrinth:jei:rsnYBmN3",
+        "filename": "jei-1.21.1-neoforge-19.69.0.457.jar",
+        "sha512": "1d8d51f845e68066f48efd4f88dd51d7c1616d314524dc15ffa286ab9930c9cca01cfd25914ab1e0e4e8a2e9d135f5c42ee2c6e77d6ed372c836c4d342c6631f",
+        "url": "https://cdn.modrinth.com/data/u6dRKJwZ/versions/rsnYBmN3/jei-1.21.1-neoforge-19.69.0.457.jar"
+      },
+      {
+        "project": "7tEfOcA7",
+        "version": "0.6.8",
+        "coordinate": "maven.modrinth:7tEfOcA7:idpM3DKC",
+        "filename": "mezz_config-1.21.1-neoforge-0.6.8-standalone.jar",
+        "sha512": "ed5ff5acf441ae2a9d2ba7ccc59e9394f4cf1e0f14802dd2ea01e9cd60c3cd412039d12f68297b3726eef63a8a85e6f4340bd969dbd1ab7e1ddc7aef88992e6b",
+        "url": "https://cdn.modrinth.com/data/7tEfOcA7/versions/idpM3DKC/mezz_config-1.21.1-neoforge-0.6.8-standalone.jar"
+      },
+      {
+        "project": "powah",
+        "version": "6.2.10-neoforge",
+        "coordinate": "maven.modrinth:powah:1prWLuga",
+        "filename": "Powah-6.2.10.jar",
+        "sha512": "41d616d3d944faaee2cde4d15b3fc35cdd154690169f43d8436e6432df50db90355ca5fef78bd0f7864d97d9a14039280c8fb78d8c3e1d407618c7ccff47d97f",
+        "url": "https://cdn.modrinth.com/data/KZO4S4DO/versions/1prWLuga/Powah-6.2.10.jar"
+      },
+      {
+        "project": "9s6osm5g",
+        "version": "15.0.140+neoforge",
+        "coordinate": "maven.modrinth:9s6osm5g:izKINKFg",
+        "filename": "cloth-config-15.0.140-neoforge.jar",
+        "sha512": "aaf9b010955b8cd294e5a92f069985b18729fd5e2cf22d351f1dff9680f15488688803ec41e77e941cbde130ceb535014ca4c868047d80ab69c2d508e216654d",
+        "url": "https://cdn.modrinth.com/data/9s6osm5g/versions/izKINKFg/cloth-config-15.0.140-neoforge.jar"
+      },
+      {
+        "project": "Ck4E7v7R",
+        "version": "21.1.19",
+        "coordinate": "maven.modrinth:Ck4E7v7R:hFpGwC6q",
+        "filename": "guideme-21.1.19.jar",
+        "sha512": "4dfa132e5cfd69a86c958867067f1c5ab39bb69ae35b2a62c24bb9924e9c688f1a4930ab75d335b22378d9f98cd7fceae8d030812b8f90c9aa282de8ea129f5a",
+        "url": "https://cdn.modrinth.com/data/Ck4E7v7R/versions/hFpGwC6q/guideme-21.1.19.jar"
+      }
+    ],
+    "unavailable": []
+  },
+  "neoforge-26.1.2": {
+    "dependencies": [
+      {
+        "project": "jei",
+        "version": "29.47.0.111",
+        "coordinate": "maven.modrinth:jei:NiYfNYIM",
+        "filename": "jei-26.1.2-neoforge-29.47.0.111.jar",
+        "sha512": "a50150076eb4bb5d56e9016fb4fc93ce297fb53b3f510174657263cffb7d460cdccb228688842376af61a63542ade3dccd72e7bc7da78bd2c9d712efd93d4d69",
+        "url": "https://cdn.modrinth.com/data/u6dRKJwZ/versions/NiYfNYIM/jei-26.1.2-neoforge-29.47.0.111.jar"
+      },
+      {
+        "project": "7tEfOcA7",
+        "version": "0.6.8",
+        "coordinate": "maven.modrinth:7tEfOcA7:ZK7XIgVN",
+        "filename": "mezz_config-26.1.2-neoforge-0.6.8-standalone.jar",
+        "sha512": "6cc0a5cb45204636b21aa193845fdaafa866759a756b12e975ff313fb14e1ec81f0b3bf256979b6bd3424d3dddac93f48cda64b9370f8e92ff70fc7f7a14ee08",
+        "url": "https://cdn.modrinth.com/data/7tEfOcA7/versions/ZK7XIgVN/mezz_config-26.1.2-neoforge-0.6.8-standalone.jar"
+      },
+      {
+        "project": "powah",
+        "version": "7.0.4-alpha-neoforge",
+        "coordinate": "maven.modrinth:powah:bymXTkIP",
+        "filename": "Powah-7.0.4-alpha.jar",
+        "sha512": "a5d1fcaa70529a0286783a49eac992a5d3cb15fa5e2aee5c7d080e86d3c501b3bce79adcf51b86c019f2119a377cdb20dd4f896c8ae468a30b01d8cdf4bd0d01",
+        "url": "https://cdn.modrinth.com/data/KZO4S4DO/versions/bymXTkIP/Powah-7.0.4-alpha.jar"
+      },
+      {
+        "project": "9s6osm5g",
+        "version": "26.1.154+neoforge",
+        "coordinate": "maven.modrinth:9s6osm5g:TimoYzse",
+        "filename": "cloth-config-26.1.154.jar",
+        "sha512": "b3084e992459c211617bf5247a94b93c06823277932341e7cec98602a6c6e21ca599aae5e552868ae7a60aac6ec33f3a9cee11615667470483948b3e349d3caf",
+        "url": "https://cdn.modrinth.com/data/9s6osm5g/versions/TimoYzse/cloth-config-26.1.154.jar"
+      },
+      {
+        "project": "Ck4E7v7R",
+        "version": "26.1.15-beta",
+        "coordinate": "maven.modrinth:Ck4E7v7R:JnplCcod",
+        "filename": "guideme-26.1.15-beta.jar",
+        "sha512": "c98f19285b37b4055a321ed9faed89cdc15dfc3bfbbad29e813f92b0fd4b6cf77b01a2ffcf971d57171c247d748e760355e87b3fd4722af699c2b0bef17a4e6e",
+        "url": "https://cdn.modrinth.com/data/Ck4E7v7R/versions/JnplCcod/guideme-26.1.15-beta.jar"
+      }
+    ],
+    "unavailable": []
+  },
+  "neoforge-26.2": {
+    "dependencies": [
+      {
+        "project": "jei",
+        "version": "30.47.0.239",
+        "coordinate": "maven.modrinth:jei:LzppbiWf",
+        "filename": "jei-26.2-neoforge-30.47.0.239.jar",
+        "sha512": "8f374d15e6daa755f3a30a0aaeb7b00ca1918e3c3e31b0aad384ffc2e39db88259f90a23125c287f06ca1e28271ddbfe2e330e5af4ff6bff8f6538d143607e2c",
+        "url": "https://cdn.modrinth.com/data/u6dRKJwZ/versions/LzppbiWf/jei-26.2-neoforge-30.47.0.239.jar"
+      },
+      {
+        "project": "7tEfOcA7",
+        "version": "0.6.8",
+        "coordinate": "maven.modrinth:7tEfOcA7:orZJbOOU",
+        "filename": "mezz_config-26.2-neoforge-0.6.8-standalone.jar",
+        "sha512": "bd9350f229322354c2ab7fe578a8a44fc990bd59c0d6fd88572ccdcc1616cbeb19a8edc1dfd998f30ebc1174104d4adfed0cf2378fb16773ff502bb294f1d369",
+        "url": "https://cdn.modrinth.com/data/7tEfOcA7/versions/orZJbOOU/mezz_config-26.2-neoforge-0.6.8-standalone.jar"
+      }
+    ],
+    "unavailable": [
+      "powah: no compatible upstream release"
+    ]
+  }
+}

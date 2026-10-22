@@ -1,0 +1,3 @@
+tasks.register('buildAll', Exec) {
+    commandLine(providers.gradleProperty('python').getOrElse('python'), 'tools/build.py', 'all')
+}

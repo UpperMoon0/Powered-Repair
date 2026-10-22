@@ -1,0 +1,49 @@
+import groovy.json.JsonSlurper
+def workspace = projectDir.parentFile
+def props = new Properties()
+new File(workspace, 'gradle.properties').withInputStream { props.load(it) }
+def config = new JsonSlurper().parse(new File(workspace, 'targets.json'))[projectDir.name]
+ext.identity = props
+ext.targetConfig = config
+group = props.mod_group
+version = props.mod_version
+if (config.minecraft == '1.12.2') {
+    archivesBaseName = "${props.mod_id}-${projectDir.name}"
+} else {
+    base { archivesName = "${props.mod_id}-${projectDir.name}" }
+    java { toolchain.languageVersion = JavaLanguageVersion.of(config.java as int); withSourcesJar() }
+}
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.blamejared.com' }
+    maven { url = 'https://www.cursemaven.com' }
+    maven { url = 'https://api.modrinth.com/maven' }
+}
+def generate = tasks.register('generateModFiles', Exec) {
+    inputs.files new File(workspace, 'gradle.properties'), new File(workspace, 'targets.json')
+    inputs.dir new File(workspace, 'tools')
+    inputs.dir new File(workspace, 'templates')
+    outputs.dir "$buildDir/generated/mod"
+    commandLine findProperty('python') ?: (System.getProperty('os.name').toLowerCase().contains('windows') ? 'python' : 'python3'),
+        new File(workspace, 'tools/generate.py'), projectDir.name
+}
+sourceSets.main.java.srcDirs(new File(workspace, 'common/src/main/java'), "$buildDir/generated/mod/java")
+sourceSets.main.resources.srcDir "$buildDir/generated/mod/resources"
+compileJava.dependsOn generate
+processResources.dependsOn generate
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+if (tasks.findByName('sourcesJar') != null) tasks.named('sourcesJar').configure { dependsOn generate }
+// Development utilities are never jar contents or production dependencies.
+def withDevMods = findProperty('devMods') != 'false'
+if (withDevMods) {
+    def lock = new JsonSlurper().parse(new File(workspace, 'dev-mods.lock.json'))[projectDir.name]
+    dependencies {
+        lock.dependencies.each { dep ->
+            if (config.loader == 'forge') {
+                def notation = dep.coordinate
+                if (config.minecraft == '1.20.1') modLocalRuntime notation
+                else runtimeOnly fg.deobf(notation)
+            } else runtimeOnly dep.coordinate
+        }
+    }
+}
