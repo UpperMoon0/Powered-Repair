@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+from java_runtime import java_home
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGETS = json.loads((ROOT / 'targets.json').read_text())
@@ -18,9 +19,9 @@ def main():
         env = os.environ.copy()
         # The legacy Gradle 5 launcher itself needs Java 8. Modern builds use 17/21.
         launcher_java = 8 if config['gradle'].startswith('5.') else 17 if config['java'] < 21 else 21
-        java_home = env.get(f'JAVA_HOME_{launcher_java}_X64') or env.get(f'JAVA{launcher_java}_HOME')
-        if java_home:
-            env['JAVA_HOME'] = java_home
+        home = java_home(launcher_java, env)
+        if home:
+            env['JAVA_HOME'] = home
         wrapper = 'gradlew.bat' if os.name == 'nt' else './gradlew'
         cmd = [wrapper, *(args.tasks or ['build']), '--no-daemon', '--console=plain']
         print(f'Building {target}: {cmd}', flush=True)

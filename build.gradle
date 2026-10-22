@@ -1,3 +1,4 @@
 tasks.register('buildAll', Exec) {
+    dependsOn ':common:test'
     commandLine(providers.gradleProperty('python').getOrElse('python'), 'tools/build.py', 'all')
 }

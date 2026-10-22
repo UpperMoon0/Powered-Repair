@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+from java_runtime import java_home
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGETS = json.loads((ROOT/'targets.json').read_text())
@@ -22,7 +23,7 @@ def main():
     env['POWERED_REPAIR_SMOKE']='1'
     # Set DEV_SMOKE=true to exercise the locked JEI/Powah dev dependency graph too.
     launcher = 8 if cfg['gradle'].startswith('5.') else 21 if cfg['java'] >= 21 else 17
-    home = env.get(f'JAVA_HOME_{launcher}_X64') or env.get(f'JAVA{launcher}_HOME')
+    home = java_home(launcher,env)
     if home:
         env['JAVA_HOME']=home
     wrapper = 'gradlew.bat' if os.name=='nt' else './gradlew'
