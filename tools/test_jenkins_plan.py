@@ -1,4 +1,6 @@
 import unittest
+import json
+from pathlib import Path
 from jenkins_plan import plan
 
 
@@ -13,3 +15,18 @@ class JenkinsPlanTests(unittest.TestCase):
         self.assertEqual(plan({'forge-1.12.2': {'java': 8, 'gradle': '5.6.4'}})[-1]['java'], 8)
         with self.assertRaises(ValueError):
             plan({'../other': {'java': 8, 'gradle': '5.6.4'}})
+
+
+class GradleToolchainCompatibilityTests(unittest.TestCase):
+    def test_gradle9_targets_do_not_use_pre_1_0_foojay_resolver(self):
+        root = Path(__file__).resolve().parents[1]
+        targets = json.loads((root / "targets.json").read_text(encoding="utf-8"))
+        verified = 0
+        for name, data in targets.items():
+            if int(data["gradle"].split(".", 1)[0]) < 9:
+                continue
+            settings = (root / name / "settings.gradle").read_text(encoding="utf-8")
+            self.assertIn("id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'", settings)
+            self.assertNotIn("version '0.9.0'", settings)
+            verified += 1
+        self.assertEqual(verified, 2)
