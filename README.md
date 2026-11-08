@@ -4,15 +4,21 @@ A small mod focused on one machine: an energy-powered equipment repair station.
 
 The project name and `powered_repair` ID are temporary. Set the final identity in `gradle.properties` before making a release. No releases are published while `identity_final=false`.
 
+The shared mod and CurseForge icon is [`icon.png`](icon.png). The generator packages it in every loader's assets and references it from the mod metadata. The ready-to-copy CurseForge front page is [`curseforge.md`](curseforge.md).
+
 ## Gameplay
 
-Craft the station with six iron ingots, two redstone dust, and an anvil:
+Craft the station with four iron ingots, two redstone dust, an anvil, and two Mending I enchanted books:
 
 ```text
-I I I
+I B I
 R A R
-I I I
+I B I
 ```
+
+`I` = iron ingot, `R` = redstone dust, `A` = anvil, `B` = Mending I enchanted book.
+Ordinary books and books without Mending do not work. Use books containing only Mending
+for compatibility with every supported version; Forge 1.12.2 and 1.16.5 require exact book NBT.
 
 Connect an energy source and right-click the station to open its five equipment slots. It restores one durability point per tick for 100 energy by default, sharing work fairly between damaged items. Names, enchantments and other item data are preserved: only damage changes. A redstone signal pauses repairs. The machine receives energy on every face and does not supply energy to other blocks.
 

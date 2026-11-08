@@ -5,7 +5,8 @@ TEMPLATES = Path(__file__).resolve().parents[1] / 'templates'
 
 def sources(cfg, family):
     if family == '112':
-        return {'RepairMod.java': (TEMPLATES / 'legacy112.java').read_text()}
+        from smoke_sources import recipe_probe
+        return {'RepairMod.java': (TEMPLATES / 'legacy112.java').read_text().replace('@RECIPE@', recipe_probe(cfg))}
     if family == '116':
         return legacy116(cfg)
     return modern(cfg)
@@ -247,7 +248,7 @@ def legacy116(cfg):
     # Official 1.16.5 mappings retain older package/class names. Keep gameplay methods identical.
     result = modern(dict(cfg, minecraft='1.20.1', _skipSmoke=True))
     from smoke_sources import modern_probe
-    result['NativeSmoke.java'] = modern_probe(dict(cfg, minecraft='1.20.1'))
+    result['NativeSmoke.java'] = modern_probe(dict(cfg, minecraft='1.20.1', _recipeMinecraft='1.16.5'))
     replacements = {
         'net.minecraft.core.BlockPos':'net.minecraft.util.math.BlockPos',
         'net.minecraft.core.Direction':'net.minecraft.util.Direction',

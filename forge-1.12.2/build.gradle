@@ -7,6 +7,8 @@ apply plugin: 'java-library'
 apply from: '../gradle/forge-1122-merge.gradle'
 apply from: '../gradle/module.gradle'
 sourceCompatibility = targetCompatibility = '1.8'
+// 1.12 discovers assets beside the mod classes during development runs.
+sourceSets.main.output.resourcesDir = compileJava.destinationDir
 minecraft {
     mappings channel:'stable', version:'39-1.12'
     runs {

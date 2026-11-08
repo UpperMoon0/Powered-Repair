@@ -11,6 +11,20 @@ def properties():
     return dict(line.split('=', 1) for line in (ROOT / 'gradle.properties').read_text().splitlines()
                 if '=' in line and not line.lstrip().startswith('#'))
 
+def mending_book(cfg):
+    """Use the loader's data-aware ingredient, never a plain enchanted-book item."""
+    version = cfg['minecraft']
+    if cfg['loader'] == 'neoforge':
+        return {'type' if version == '1.21.1' else 'neoforge:ingredient_type': 'neoforge:components',
+                'items': 'minecraft:enchanted_book',
+                'components': {'minecraft:stored_enchantments': {'minecraft:mending': 1}}}
+    if version == '1.12.2':
+        return {'type': 'minecraft:item_nbt', 'item': 'minecraft:enchanted_book', 'data': 0,
+                'nbt': '{StoredEnchantments:[{id:70s,lvl:1s}]}'}
+    return {'type': 'forge:nbt' if version == '1.16.5' else 'forge:partial_nbt',
+            'item': 'minecraft:enchanted_book',
+            'nbt': '{StoredEnchantments:[{id:"minecraft:mending",lvl:1s}]}'}
+
 def generate(target):
     p = properties()
     cfg = json.loads((ROOT / 'targets.json').read_text())[target]
@@ -28,6 +42,12 @@ def generate(target):
         path.write_text(value, encoding='utf-8')
     def resource(path, data):
         write('resources/' + path, json.dumps(data, indent=2) + '\n')
+    icon = ROOT / 'icon.png'
+    if icon.stat().st_size > 2_000_000:
+        raise ValueError('Mod icon must be 2 MB or smaller')
+    icon_path = f'assets/{mod}/icon.png'
+    (out / 'resources' / icon_path).parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(icon, out / 'resources' / icon_path)
     values = {'ID': mod, 'NAME': p['mod_name'], 'VERSION': p['mod_version']}
     # Native APIs changed at these boundaries; repair behavior remains in common/.
     family = '112' if cfg['minecraft'] == '1.12.2' else '116' if cfg['minecraft'] == '1.16.5' else 'modern'
@@ -55,11 +75,12 @@ def generate(target):
     modern = cfg['minecraft'].startswith('26.')
     singular = modern or cfg['minecraft'] == '1.21.1'
     recipes, loot = ('recipe', 'loot_table') if singular else ('recipes', 'loot_tables')
-    key = (lambda item: item) if modern else (lambda item: {'item': item})
+    key = (lambda item: item) if modern else (lambda item: {'item': item, **({'data': 0} if family == '112' else {})})
     result = {'id' if singular else 'item': f'{mod}:repair_station', 'count': 1}
-    resource(f'data/{mod}/{recipes}/repair_station.json', {'type': 'minecraft:crafting_shaped',
-        'pattern': ['III', 'RAR', 'III'], 'key': {'I': key('minecraft:iron_ingot'),
-        'R': key('minecraft:redstone'), 'A': key('minecraft:anvil')}, 'result': result})
+    recipe_root = 'assets' if family == '112' else 'data'
+    resource(f'{recipe_root}/{mod}/{recipes}/repair_station.json', {'type': 'minecraft:crafting_shaped',
+        'pattern': ['IBI', 'RAR', 'IBI'], 'key': {'I': key('minecraft:iron_ingot'),
+        'R': key('minecraft:redstone'), 'A': key('minecraft:anvil'), 'B': mending_book(cfg)}, 'result': result})
     if family != '112':
         resource(f'data/{mod}/{loot}/blocks/repair_station.json', {'type': 'minecraft:block', 'pools': [{'rolls': 1,
             'entries': [{'type': 'minecraft:item', 'name': f'{mod}:repair_station'}],
@@ -70,7 +91,8 @@ def generate(target):
         resource(f'assets/{mod}/items/repair_station.json', {'model': {'type': 'minecraft:model', 'model': f'{mod}:item/repair_station'}})
     if family == '112':
         resource('mcmod.info', [{'modid': mod, 'name': p['mod_name'], 'description': p['mod_description'],
-            'version': p['mod_version'], 'mcversion': cfg['minecraft'], 'authorList': [p['mod_authors']]}])
+            'version': p['mod_version'], 'mcversion': cfg['minecraft'], 'authorList': [p['mod_authors']],
+            'logoFile': icon_path}])
     else:
         neo = cfg['loader'] == 'neoforge'
         minloader = '1' if neo else '36' if family == '116' else '47'
@@ -81,6 +103,7 @@ license="{p['mod_license']}"
 modId="{mod}"
 version="{p['mod_version']}"
 displayName="{p['mod_name']}"
+logoFile="{icon_path}"
 authors="{p['mod_authors']}"
 description=''' + "'''" + p['mod_description'] + "'''" + f'''
 [[dependencies.{mod}]]

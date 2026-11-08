@@ -20,7 +20,7 @@ repositories {
     maven { url = 'https://api.modrinth.com/maven' }
 }
 def generate = tasks.register('generateModFiles', Exec) {
-    inputs.files new File(workspace, 'gradle.properties'), new File(workspace, 'targets.json')
+    inputs.files new File(workspace, 'gradle.properties'), new File(workspace, 'targets.json'), new File(workspace, 'icon.png')
     inputs.dir new File(workspace, 'tools')
     inputs.dir new File(workspace, 'templates')
     outputs.dir "$buildDir/generated/mod"

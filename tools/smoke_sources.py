@@ -1,5 +1,47 @@
 """Opt-in native adapter acceptance probe, run only in isolated development servers."""
 
+def recipe_probe(cfg):
+    version = cfg.get('_recipeMinecraft', cfg['minecraft'])
+    legacy = version in ('1.12.2', '1.16.5')
+    new = version.startswith('26.')
+    item = 'net.minecraft.item' if legacy else 'net.minecraft.world.item'
+    crafting = item + '.crafting'
+    if version == '1.12.2':
+        recipe = 'net.minecraft.item.crafting.CraftingManager.getRecipe(new net.minecraft.util.ResourceLocation(RepairMod.ID,"repair_station"))'
+    elif new:
+        recipe = 'event.getServer().getRecipeManager().byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,net.minecraft.resources.Identifier.fromNamespaceAndPath(RepairMod.ID,"repair_station"))).orElseThrow().value()'
+    else:
+        location = 'new net.minecraft.util.ResourceLocation' if legacy else 'net.minecraft.resources.ResourceLocation.fromNamespaceAndPath' if version == '1.21.1' else 'new net.minecraft.resources.ResourceLocation'
+        recipe = f'level.getRecipeManager().byKey({location}(RepairMod.ID,"repair_station")).get()'
+        if version == '1.21.1': recipe += '.value()'
+    enchant = 'net.minecraft.enchantment' if legacy else item + '.enchantment'
+    if new or version == '1.21.1':
+        add = f'book.enchant(level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).getOrThrow({enchant}.Enchantments.MENDING),1);'
+        wrong = f'wrongBook.enchant(level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).getOrThrow({enchant}.Enchantments.UNBREAKING),1);'
+    else:
+        book_class = 'ItemEnchantedBook' if version == '1.12.2' else 'EnchantedBookItem'
+        instance = 'EnchantmentData' if legacy else 'EnchantmentInstance'
+        add = f'{item}.{book_class}.addEnchantment(book,new {enchant}.{instance}({enchant}.Enchantments.MENDING,1));'
+        wrong = f'{item}.{book_class}.addEnchantment(wrongBook,new {enchant}.{instance}({enchant}.Enchantments.UNBREAKING,1));'
+        if version == '1.12.2':
+            add = add.replace('net.minecraft.enchantment.Enchantments.', 'net.minecraft.init.Enchantments.')
+            wrong = wrong.replace('net.minecraft.enchantment.Enchantments.', 'net.minecraft.init.Enchantments.')
+    items = 'net.minecraft.init.Items' if version == '1.12.2' else item + '.Items'
+    get = '.orElseThrow()' if new else ''
+    test = 'apply' if version == '1.12.2' else 'test'
+    return f'''{crafting}.Shaped{'Recipes' if version == '1.12.2' else 'Recipe'} stationRecipe=({crafting}.Shaped{'Recipes' if version == '1.12.2' else 'Recipe'})({recipe});
+            {item}.ItemStack book=new {item}.ItemStack({items}.ENCHANTED_BOOK);
+            {item}.ItemStack wrongBook=new {item}.ItemStack({items}.ENCHANTED_BOOK);
+            {add}
+            {wrong}
+            for(int bookSlot : new int[]{{1,7}}) {{
+                {crafting}.Ingredient ingredient=stationRecipe.getIngredients().get(bookSlot){get};
+                if(!ingredient.{test}(book) || ingredient.{test}(wrongBook)
+                    || ingredient.{test}(new {item}.ItemStack({items}.BOOK))
+                    || ingredient.{test}(new {item}.ItemStack({items}.ENCHANTED_BOOK)))
+                    throw new AssertionError("recipe requires Mending in both book slots");
+            }}'''
+
 def modern_probe(cfg):
     new = cfg['minecraft'].startswith('26.')
     neo = cfg['loader'] == 'neoforge'
@@ -19,6 +61,7 @@ public final class NativeSmoke {
     public static void run(ServerStartedEvent event) {
         try {
             var level = event.getServer().overworld();
+            @RECIPE@
             var pos = new BlockPos(0, 90, 0);
             level.setBlockAndUpdate(pos, RepairMod.BLOCK.get().defaultBlockState());
             var machine = (RepairMachine)level.getBlockEntity(pos);
@@ -83,6 +126,6 @@ public final class NativeSmoke {
             energy.receiveEnergy(1000,false); check(energy.extractEnergy(100,false)==0,"receive only");
             check(machine.getCapability(net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER,Direction.DOWN).isPresent(),"native item capability");'''
     save = 'var saved=machine.saveWithFullMetadata('+('level.registryAccess()' if lookup else '')+');\n            var restored=BlockEntity.loadStatic(pos,machine.getBlockState(),saved'+(',level.registryAccess()' if lookup else '')+');'
-    for key,value in {'NS':ns,'NAME':name,'POWER':power,'SAVE':save,'MC':cfg['minecraft']}.items():
+    for key,value in {'NS':ns,'NAME':name,'POWER':power,'SAVE':save,'MC':cfg['minecraft'], 'RECIPE':recipe_probe(cfg)}.items():
         source=source.replace('@'+key+'@',value)
     return source

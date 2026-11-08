@@ -30,12 +30,15 @@ def inspect(target, jar=None):
                     'com/nstut/repair/core/EnergyBuffer.class', 'com/nstut/repair/RepairMod.class'}
         cfg = TARGETS[target]
         metadata = 'mcmod.info' if cfg['minecraft'] == '1.12.2' else 'META-INF/neoforge.mods.toml' if cfg['loader'] == 'neoforge' else 'META-INF/mods.toml'
-        required |= {metadata, f"assets/{p['mod_id']}/blockstates/repair_station.json"}
+        icon_path = f"assets/{p['mod_id']}/icon.png"
+        required |= {metadata, f"assets/{p['mod_id']}/blockstates/repair_station.json", icon_path}
         if not required <= names:
             raise ValueError(f'{target}: missing {sorted(required - names)}')
         text = z.read(metadata).decode()
         if p['mod_id'] not in text or p['mod_version'] not in text or '${' in text:
             raise ValueError('Invalid packaged identity/version')
+        if icon_path not in text or z.read(icon_path) != (ROOT/'icon.png').read_bytes():
+            raise ValueError('Missing icon metadata or outdated packaged icon')
         limit = {8:52,17:61,21:65,25:69}[cfg['java']]
         for name in names:
             if name.endswith('.class'):

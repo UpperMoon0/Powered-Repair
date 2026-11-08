@@ -20,6 +20,7 @@ class WorkspaceTests(unittest.TestCase):
             root = Path(directory)
             (root/'gradle.properties').write_text((generate.ROOT/'gradle.properties').read_text())
             (root/'targets.json').write_text((generate.ROOT/'targets.json').read_text())
+            (root/'icon.png').write_bytes((generate.ROOT/'icon.png').read_bytes())
             with patch.object(generate,'ROOT',root):
                 for target, cfg in release.TARGETS.items():
                     generate.generate(target)
@@ -28,9 +29,18 @@ class WorkspaceTests(unittest.TestCase):
                     self.assertNotRegex(java, r'@[A-Z_]+@')
                     self.assertIn('RepairEngine', java)
                     self.assertIn(props['mod_id'],java)
+                    icon_path = f"assets/{props['mod_id']}/icon.png"
+                    self.assertEqual((output/'resources'/icon_path).read_bytes(), (root/'icon.png').read_bytes())
+                    metadata = next(output.rglob('mcmod.info' if cfg['minecraft'] == '1.12.2' else 'neoforge.mods.toml' if cfg['loader'] == 'neoforge' else 'mods.toml'))
+                    self.assertIn(icon_path, metadata.read_text())
                     files = list(output.rglob('repair_station.json'))
-                    recipe = next(json.loads(f.read_text()) for f in files if '/data/' in f.as_posix() and '/tags/' not in f.as_posix() and '/blocks/' not in f.as_posix())
-                    key = {k:v if isinstance(v,str) else v['item'] for k,v in recipe['key'].items()}
+                    recipe = next(json.loads(f.read_text()) for f in files if f.parent.name in ('recipe','recipes'))
+                    recipe_root = 'assets' if cfg['minecraft'] == '1.12.2' else 'data'
+                    self.assertTrue((output/'resources'/recipe_root/props['mod_id']/('recipe' if cfg['loader'] == 'neoforge' else 'recipes')/'repair_station.json').is_file())
+                    self.assertEqual(recipe['pattern'], ['IBI','RAR','IBI'])
+                    self.assertEqual(''.join(recipe['pattern']).count('B'), 2)
+                    self.assertIn('mending' if cfg['minecraft'] != '1.12.2' else '70s', json.dumps(recipe['key']['B']))
+                    key = {k:v if isinstance(v,str) else v.get('item',v.get('items')) for k,v in recipe['key'].items()}
                     result = recipe['result']
                     recipes.append((recipe['pattern'],key,result.get('id',result.get('item')),result['count']))
         self.assertTrue(all(recipe == recipes[0] for recipe in recipes))
@@ -48,6 +58,7 @@ class WorkspaceTests(unittest.TestCase):
             text=(generate.ROOT/'gradle.properties').read_text()
             (root/'gradle.properties').write_text(text)
             (root/'targets.json').write_text((generate.ROOT/'targets.json').read_text())
+            (root/'icon.png').write_bytes((generate.ROOT/'icon.png').read_bytes())
             with patch.object(generate,'ROOT',root):
                 generate.generate('forge-1.20.1')
                 old=generate.properties()['mod_id']

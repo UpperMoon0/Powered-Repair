@@ -1,5 +1,17 @@
 # Verification record
 
+Branding verification on 2026-11-08:
+
+- The final gradient-background wrench-and-lightning PNG project icon is 1,424,037 bytes, below the 2 MB limit. All seven workspace checks passed and all six generated modules contain identical icon bytes with matching metadata references.
+- All six production module builds and package inspections passed during the earlier icon integration. The final graphic has been refreshed in generated resources; existing built JARs need rebuilding to include this latest revision.
+- Mod-list display was verified through generated metadata and packaged assets; it has not been visually checked in a running client.
+
+Recipe verification on 2026-11-08:
+
+- All seven workspace checks passed with the updated recipe on all six targets.
+- All six native dedicated-server probes passed. Both book slots accept Mending I books and reject ordinary books, empty enchanted books and Unbreaking-only books. These runs used `devMods=false`.
+- Forge 1.12.2 recipes now use the legacy `assets/<mod_id>/recipes` directory, explicit anvil metadata, and development resources beside the mod classes so the native loader can discover them.
+
 Local verification on 2026-10-23:
 
 - All six production modules compiled and their JAR identity, shared core classes, bytecode level and absence of bundled dependencies were checked.

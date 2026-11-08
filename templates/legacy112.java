@@ -45,6 +45,7 @@ public final class RepairMod {
         net.minecraft.server.MinecraftServer server=net.minecraftforge.fml.common.FMLCommonHandler.instance().getMinecraftServerInstance();
         try {
             World world=server.getWorld(0); BlockPos pos=new BlockPos(0,90,0);
+            @RECIPE@
             world.setBlockState(pos,BLOCK.getDefaultState());
             Machine machine=(Machine)world.getTileEntity(pos);
             if(machine==null) throw new AssertionError("block entity registration");
