@@ -24,6 +24,26 @@ class JenkinsPlanTests(unittest.TestCase):
 
 
 class GradleToolchainCompatibilityTests(unittest.TestCase):
+    def test_legacy_network_preparation_retries_without_running_the_server(self):
+        responses = [SimpleNamespace(returncode=1,stdout='SocketTimeoutException: Read timed out',stderr='',args=['downloadAssets']),
+                     SimpleNamespace(returncode=0,stdout='',stderr='',args=['downloadAssets'])]
+        with patch.object(jenkins_runtime,'gradle',side_effect=responses) as run, patch.object(jenkins_runtime.time,'sleep'):
+            jenkins_runtime.prepare_legacy_assets('forge-1.12.2',{})
+            self.assertEqual(run.call_count,2)
+            self.assertTrue(all(call.args[1][0]=='downloadAssets' for call in run.call_args_list))
+
+    def test_non_network_failures_are_fatal_and_download_retries_are_bounded(self):
+        import subprocess
+        for output, attempts in [('Compilation failed',1),('Read timed out',3)]:
+            response=SimpleNamespace(returncode=1,stdout=output,stderr='',args=['downloadAssets'])
+            with self.subTest(output=output), patch.object(jenkins_runtime,'gradle',return_value=response) as run, patch.object(jenkins_runtime.time,'sleep'):
+                with self.assertRaises(subprocess.CalledProcessError):
+                    jenkins_runtime.prepare_legacy_assets('forge-1.12.2',{})
+                self.assertEqual(run.call_count,attempts)
+        with patch.object(jenkins_runtime,'gradle') as run:
+            jenkins_runtime.prepare_legacy_assets('neoforge-1.21.1',{})
+            run.assert_not_called()
+
     def test_pinned_jenkins_jdk_environment_is_honored(self):
         self.assertEqual(java_home(8, {'JAVA_HOME_8': 'pinned-java8'}), 'pinned-java8')
 
