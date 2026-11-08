@@ -7,13 +7,14 @@ import shutil
 import subprocess
 import sys
 from release import ROOT, TARGETS, filename, inspect
-from jenkins_runtime import environment, gradle
+from jenkins_runtime import environment, gradle, prepare_legacy_assets
 
 
 def main(target):
     if target not in TARGETS:
         raise ValueError('Unknown native target')
     env = environment(target)
+    prepare_legacy_assets(target, env)
     gradle(target, ['build', '-PdevMods=false'], env)
     manifest = inspect(target)
     destination = ROOT / 'ci-production' / target

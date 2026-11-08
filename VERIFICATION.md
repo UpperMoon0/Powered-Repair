@@ -1,5 +1,11 @@
 # Verification record
 
+Release candidate 0.1.0 on 2026-11-08:
+
+- Reviewed current main and the latest live CI failure: vanilla asset download preparation timed out on Forge 1.12.2 before native server acceptance. Added three bounded attempts for that download-only task; compilation, gameplay and native probe failures are never retried or hidden.
+- All 16 repository checks passed, including transient-download recovery, bounded retries and immediate failure for non-network errors. The eight shared Java contracts cover repair cost, scheduling, redstone pause, filtering, capacity/simulation and overflow.
+- Release readiness requires a fresh successful six-target Jenkins/broker result. Existing native adapter and recipe/menu probes remain mandatory; only NeoForge 1.21.1 has automated client visual previews. Initial publication is an alpha; visual appearance on the other five clients and nonstandard modded durability systems remain unverified.
+
 Central release integration on 2026-11-08:
 
 - Confirmed CurseForge project 1791835 in the author dashboard; project moderation is pending and no files have been uploaded. Finalized the existing Powered Repair identity.

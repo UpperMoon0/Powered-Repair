@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import time
 from java_runtime import java_home
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,14 +35,34 @@ def environment(target=None):
     return env
 
 
-def gradle(target, tasks, env):
+def gradle(target, tasks, env, capture=False):
     root = ROOT / target if target else ROOT
     wrapper = 'gradlew.bat' if os.name == 'nt' else './gradlew'
     if os.name != 'nt':
         path = root / 'gradlew'
         path.chmod(path.stat().st_mode | 0o111)
-    subprocess.run([wrapper, *tasks, '--no-daemon', '--max-workers=1', '--console=plain'],
-                   cwd=root, env=env, check=True, shell=os.name == 'nt')
+    return subprocess.run([wrapper, *tasks, '--no-daemon', '--max-workers=1', '--console=plain'],
+                          cwd=root, env=env, check=not capture, shell=os.name == 'nt',
+                          capture_output=capture, text=True)
+
+
+def prepare_legacy_assets(target, env):
+    """Retry only download preparation; never retry a server acceptance failure."""
+    if target != 'forge-1.12.2':
+        return
+    transient = ('read timed out', 'connect timed out', 'connection reset',
+                 'http response code: 429', 'http response code: 502',
+                 'http response code: 503', 'http response code: 504')
+    for attempt in range(3):
+        result = gradle(target, ['downloadAssets', '-PdevMods=false', '-PclientUi=false'], env, capture=True)
+        output = (result.stdout or '') + (result.stderr or '')
+        print(output, end='', flush=True)
+        if result.returncode == 0:
+            return
+        if attempt == 2 or not any(marker in output.lower() for marker in transient):
+            raise subprocess.CalledProcessError(result.returncode, result.args)
+        print('Transient vanilla asset download failed; retrying preparation only', flush=True)
+        time.sleep((2, 5)[attempt])
 
 
 if __name__ == '__main__':
