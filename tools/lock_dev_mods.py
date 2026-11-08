@@ -4,6 +4,7 @@ from pathlib import Path
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
+POWER_FALLBACKS = {'forge-1.12.2': 'solar-flux-reborn', 'neoforge-26.2': 'energized-power'}
 
 def get(path):
     request = urllib.request.Request('https://api.modrinth.com/v2/' + path,
@@ -44,6 +45,8 @@ def main():
                 {'project': 'lollipop', 'version': '3.2.9', 'coordinate': 'curse.maven:lollipop-347954:3232534'}])
         else:
             add('powah', optional=True)
+            if not any(entry['project'] == 'powah' for entry in entries):
+                add(POWER_FALLBACKS[target])
         lock[target] = {'dependencies': entries, 'unavailable': missing}
         print(target, [(e['project'],e['version']) for e in entries], missing, flush=True)
     (ROOT / 'dev-mods.lock.json').write_text(json.dumps(lock, indent=2) + '\n')

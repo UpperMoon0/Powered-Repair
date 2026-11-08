@@ -24,6 +24,11 @@ def main():
             env['JAVA_HOME'] = home
         wrapper = 'gradlew.bat' if os.name == 'nt' else './gradlew'
         cmd = [wrapper, *(args.tasks or ['build']), '--no-daemon', '--console=plain']
+        # Explicit discovery also works when a workstation disables Gradle's auto-detection.
+        homes = [java_home(major, env) for major in (8, 17, 21, 25)]
+        homes = list(dict.fromkeys(home for home in homes if home))
+        if homes:
+            cmd.append('-Porg.gradle.java.installations.paths=' + ','.join(homes))
         print(f'Building {target}: {cmd}', flush=True)
         subprocess.run(cmd, cwd=ROOT / target, env=env, check=True, shell=os.name == 'nt')
 

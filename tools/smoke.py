@@ -27,7 +27,10 @@ def main():
     if home:
         env['JAVA_HOME']=home
     wrapper = 'gradlew.bat' if os.name=='nt' else './gradlew'
-    command=[wrapper,'runServer','--no-daemon','--console=plain']
+    command=[wrapper,'runServer','--no-daemon','--console=plain','-PclientUi=false']
+    homes=list(dict.fromkeys(home for home in (java_home(v,env) for v in (8,17,21,25)) if home))
+    if homes:
+        command.append('-Porg.gradle.java.installations.paths='+','.join(homes))
     if env.get('DEV_SMOKE')!='true':
         command.append('-PdevMods=false')
     subprocess.run(command,cwd=ROOT/target,env=env,check=True,timeout=900,shell=os.name=='nt')

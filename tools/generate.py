@@ -57,19 +57,28 @@ def generate(target):
             text = text.replace('@' + key + '@', value)
         write('java/com/nstut/repair/' + filename, text)
     resource('pack.mcmeta', {'pack': {'pack_format': cfg['pack'], 'description': p['mod_name']}})
-    resource(f'assets/{mod}/blockstates/repair_station.json', {'variants': {'': {'model': f'{mod}:block/repair_station'}}})
-    texture_root = 'blocks' if family == '112' else 'block'
-    resource(f'assets/{mod}/models/block/repair_station.json', {
-        'parent': 'minecraft:block/cube', 'textures': {
-            'particle': f'minecraft:{texture_root}/iron_block', 'down': f'minecraft:{texture_root}/iron_block',
-            'up': f'minecraft:{texture_root}/' + ('anvil_top_damaged_0' if family == '112' else 'anvil_top'), 'north': f'minecraft:{texture_root}/redstone_block',
-            'east': f'minecraft:{texture_root}/iron_block', 'south': f'minecraft:{texture_root}/redstone_block',
-            'west': f'minecraft:{texture_root}/iron_block'}})
+    from station_assets import ART, model, translations
+    resource(f'assets/{mod}/blockstates/repair_station.json', {'variants': {
+        f'facing={direction}': {'model': f'{mod}:block/repair_station', 'y': angle}
+        for direction, angle in (('north',0),('east',90),('south',180),('west',270))}})
+    block_model=model(mod)
+    from model_validation import validate_model
+    material_sizes={}
+    for texture in (ART/'textures/block').glob('*.png'):
+        png=texture.read_bytes()
+        material_sizes[f'{mod}:block/{texture.stem}']=(int.from_bytes(png[16:20],'big'),int.from_bytes(png[20:24],'big'))
+    validate_model(block_model,material_sizes)
+    resource(f'assets/{mod}/models/block/repair_station.json', block_model)
+    texture_dir = out / f'resources/assets/{mod}/textures/block'
+    texture_dir.mkdir(parents=True, exist_ok=True)
+    for texture in (ART/'textures/block').glob('*.png'):
+        shutil.copyfile(texture, texture_dir/texture.name)
     resource(f'assets/{mod}/models/item/repair_station.json', {'parent': f'{mod}:block/repair_station'})
     lang = {f'block.{mod}.repair_station': p['mod_name'] + ' Station', f'tile.{mod}.repair_station.name': p['mod_name'] + ' Station',
             f'container.{mod}.repair_station': 'Repair Station'}
+    lang.update(translations(mod))
     if family == '112':
-        write(f'resources/assets/{mod}/lang/en_us.lang', '\n'.join(k+'='+v for k,v in lang.items())+'\n')
+        write(f'resources/assets/{mod}/lang/en_us.lang', '\n'.join(k+'='+v.replace('\n','\\n') for k,v in lang.items())+'\n')
     else:
         resource(f'assets/{mod}/lang/en_us.json', lang)
     modern = cfg['minecraft'].startswith('26.')
@@ -92,7 +101,7 @@ def generate(target):
     if family == '112':
         resource('mcmod.info', [{'modid': mod, 'name': p['mod_name'], 'description': p['mod_description'],
             'version': p['mod_version'], 'mcversion': cfg['minecraft'], 'authorList': [p['mod_authors']],
-            'logoFile': icon_path}])
+            'logoFile': icon_path, 'dependencies': ['openui_mc']}])
     else:
         neo = cfg['loader'] == 'neoforge'
         minloader = '1' if neo else '36' if family == '116' else '47'
@@ -118,6 +127,12 @@ modId="minecraft"
 versionRange="[{cfg['minecraft']}]"
 ordering="NONE"
 side="BOTH"
+[[dependencies.{mod}]]
+modId="openui_mc"
+{'type="required"' if neo else 'mandatory=true'}
+versionRange="[{p['openui_version']},)"
+ordering="AFTER"
+side="CLIENT"
 '''
         write('resources/META-INF/' + ('neoforge.mods.toml' if neo else 'mods.toml'), text)
 

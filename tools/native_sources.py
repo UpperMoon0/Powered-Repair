@@ -6,10 +6,13 @@ TEMPLATES = Path(__file__).resolve().parents[1] / 'templates'
 def sources(cfg, family):
     if family == '112':
         from smoke_sources import recipe_probe
-        return {'RepairMod.java': (TEMPLATES / 'legacy112.java').read_text().replace('@RECIPE@', recipe_probe(cfg))}
-    if family == '116':
-        return legacy116(cfg)
-    return modern(cfg)
+        result = {'RepairMod.java': (TEMPLATES / 'legacy112.java').read_text().replace('@RECIPE@', recipe_probe(cfg))}
+    elif family == '116':
+        result = legacy116(cfg)
+    else:
+        result = modern(cfg)
+    from presentation_sources import enhance
+    return enhance(result,cfg)
 
 def modern(cfg):
     neo = cfg['loader'] == 'neoforge'
@@ -209,7 +212,7 @@ import {ns}.items.wrapper.SidedInvWrapper;'''
     item_cap = 'new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side)' if new else 'new net.neoforged.neoforge.items.wrapper.SidedInvWrapper(be, side == null ? net.minecraft.core.Direction.DOWN : side)'
     replacements = {
         'REGISTER': register, 'NS': ns, 'FML': fml, 'BUS': bus, 'BLOCKS':keys[0], 'ITEMS':keys[1], 'ENTITIES':keys[2],
-        'BLOCK_PROPERTIES': 'BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).setId(net.minecraft.resources.ResourceKey.create(Registries.BLOCK, net.minecraft.resources.Identifier.fromNamespaceAndPath(ID, "repair_station")))' if new else 'BlockBehaviour.Properties.of().strength(3.5F)',
+        'BLOCK_PROPERTIES': 'BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().setId(net.minecraft.resources.ResourceKey.create(Registries.BLOCK, net.minecraft.resources.Identifier.fromNamespaceAndPath(ID, "repair_station")))' if new else 'BlockBehaviour.Properties.of().strength(3.5F).noOcclusion()',
         'ITEM_PROPERTIES': 'new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath(ID, "repair_station")))' if new else 'new Item.Properties()',
         'BE_FACTORY': 'new BlockEntityType<>(RepairMachine::new, Set.of(BLOCK.get()))' if new else 'BlockEntityType.Builder.of(RepairMachine::new, BLOCK.get()).build(null)',
         'CONSTRUCTOR_ARG': 'IEventBus bus' if neo else '',

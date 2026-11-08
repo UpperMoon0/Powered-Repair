@@ -8,6 +8,14 @@
         "filename": "jei_1.12.2-4.22.0.1037.jar",
         "sha512": "3fde06850308ee488eaae1b36b04e46ed23612f89dcf0485866488c72cc9eea552f3b6e5e340d84f865043eea4aa61c0d36d1d2358f0712c7c94458bd3ed79cb",
         "url": "https://cdn.modrinth.com/data/u6dRKJwZ/versions/fktQZbF6/jei_1.12.2-4.22.0.1037.jar"
+      },
+      {
+        "project": "solar-flux-reborn",
+        "version": "12.4.11",
+        "coordinate": "maven.modrinth:solar-flux-reborn:OABvRB8v",
+        "filename": "SolarFluxReborn-1.12.2-12.4.11.jar",
+        "sha512": "ba92a55c934d48ba1cd13ee62320ac8cf83b3222c89771ba13ed1435f16e0e6b23f67b02f923f3aa17b0c1b48dd056abbef6884307ef5a84e9f5554bc1816879",
+        "url": "https://cdn.modrinth.com/data/4QG5lev4/versions/OABvRB8v/SolarFluxReborn-1.12.2-12.4.11.jar"
       }
     ],
     "unavailable": [
@@ -189,6 +197,14 @@
         "filename": "mezz_config-26.2-neoforge-0.6.8-standalone.jar",
         "sha512": "bd9350f229322354c2ab7fe578a8a44fc990bd59c0d6fd88572ccdcc1616cbeb19a8edc1dfd998f30ebc1174104d4adfed0cf2378fb16773ff502bb294f1d369",
         "url": "https://cdn.modrinth.com/data/7tEfOcA7/versions/orZJbOOU/mezz_config-26.2-neoforge-0.6.8-standalone.jar"
+      },
+      {
+        "project": "energized-power",
+        "version": "3.0.7+26.2.x-neoforge",
+        "coordinate": "maven.modrinth:energized-power:J2hCJV6Z",
+        "filename": "energizedpower-3.0.7+26.2.x-neoforge.jar",
+        "sha512": "d1a8d4eced2fa871faeab9a07b0bf068b6e75c11a3308d843cd0992e9f0a1652c93fe1890249419e86772899dd8b0d4062e93a9c4d13c3f07c30663af9585911",
+        "url": "https://cdn.modrinth.com/data/6pku8gW1/versions/J2hCJV6Z/energizedpower-3.0.7%2B26.2.x-neoforge.jar"
       }
     ],
     "unavailable": [

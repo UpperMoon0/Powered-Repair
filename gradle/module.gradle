@@ -18,11 +18,26 @@ repositories {
     maven { url = 'https://maven.blamejared.com' }
     maven { url = 'https://www.cursemaven.com' }
     maven { url = 'https://api.modrinth.com/maven' }
+    ivy {
+        url = 'https://github.com/UpperMoon0/OpenUI-MC/releases/download'
+        patternLayout { artifact 'v[revision]/[artifact]-[revision].[ext]' }
+        metadataSources { artifact() }
+        content { includeGroup 'com.nstut.openui' }
+    }
+}
+
+def openui = "com.nstut.openui:openui-mc-${projectDir.name}:${props.openui_version}"
+def clientUi = findProperty('clientUi') != 'false'
+dependencies {
+    if (config.minecraft == '1.20.1') add(clientUi ? 'modImplementation' : 'modCompileOnly', openui)
+    else if (config.loader == 'forge') add(clientUi ? 'implementation' : 'compileOnly', fg.deobf(openui))
+    else add(clientUi ? 'implementation' : 'compileOnly', openui)
 }
 def generate = tasks.register('generateModFiles', Exec) {
     inputs.files new File(workspace, 'gradle.properties'), new File(workspace, 'targets.json'), new File(workspace, 'icon.png')
     inputs.dir new File(workspace, 'tools')
     inputs.dir new File(workspace, 'templates')
+    inputs.dir new File(workspace, 'assets-source')
     outputs.dir "$buildDir/generated/mod"
     commandLine findProperty('python') ?: (System.getProperty('os.name').toLowerCase().contains('windows') ? 'python' : 'python3'),
         new File(workspace, 'tools/generate.py'), projectDir.name

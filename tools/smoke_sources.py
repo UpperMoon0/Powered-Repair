@@ -43,6 +43,7 @@ def recipe_probe(cfg):
             }}'''
 
 def modern_probe(cfg):
+    from menu_smoke_sources import menu_probe
     new = cfg['minecraft'].startswith('26.')
     neo = cfg['loader'] == 'neoforge'
     lookup = cfg['minecraft'] == '1.21.1' or new
@@ -74,6 +75,7 @@ public final class NativeSmoke {
             check(!machine.canTakeItemThroughFace(0,tool,Direction.DOWN), "no premature extraction");
             @POWER@
             int stored = machine.power.stored();
+            @MENU_PROBE@
             level.setBlockAndUpdate(pos.east(), Blocks.REDSTONE_BLOCK.defaultBlockState());
             machine.tick();
             check(tool.getDamageValue()==10 && machine.power.stored()==stored, "redstone pause");
@@ -126,6 +128,6 @@ public final class NativeSmoke {
             energy.receiveEnergy(1000,false); check(energy.extractEnergy(100,false)==0,"receive only");
             check(machine.getCapability(net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER,Direction.DOWN).isPresent(),"native item capability");'''
     save = 'var saved=machine.saveWithFullMetadata('+('level.registryAccess()' if lookup else '')+');\n            var restored=BlockEntity.loadStatic(pos,machine.getBlockState(),saved'+(',level.registryAccess()' if lookup else '')+');'
-    for key,value in {'NS':ns,'NAME':name,'POWER':power,'SAVE':save,'MC':cfg['minecraft'], 'RECIPE':recipe_probe(cfg)}.items():
+    for key,value in {'NS':ns,'NAME':name,'POWER':power,'SAVE':save,'MC':cfg['minecraft'], 'RECIPE':recipe_probe(cfg), 'MENU_PROBE':menu_probe(cfg)}.items():
         source=source.replace('@'+key+'@',value)
     return source

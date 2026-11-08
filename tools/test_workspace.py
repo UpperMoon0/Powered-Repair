@@ -2,13 +2,32 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import copy
 from unittest.mock import patch
 
 import generate
 import native_sources
 import release
+from model_validation import validate_model
+from station_assets import model
 
 class WorkspaceTests(unittest.TestCase):
+    def test_model_uses_one_texel_per_model_unit_on_every_face(self):
+        block=model('test_repair')
+        sizes={f'test_repair:block/{m}':(16,16) for m in ('steel','casing','vent','circuit')}
+        self.assertEqual(validate_model(block,sizes),132)
+        stretched=copy.deepcopy(block)
+        stretched['elements'][0]['faces']['north']['uv']=[0,0,16,16]
+        with self.assertRaisesRegex(ValueError,'stretched texture'):
+            validate_model(stretched,sizes)
+        partial=copy.deepcopy(block)
+        partial['elements'][0]['from'][0]=1.5
+        with self.assertRaisesRegex(ValueError,'whole-texel grid'):
+            validate_model(partial,sizes)
+        wrong_resolution={**sizes,'test_repair:block/steel':(32,32)}
+        with self.assertRaisesRegex(ValueError,'stretched texture'):
+            validate_model(block,wrong_resolution)
+
     def test_only_requested_targets(self):
         self.assertEqual(set(release.TARGETS), {'forge-1.12.2','forge-1.16.5','forge-1.20.1',
             'neoforge-1.21.1','neoforge-26.1.2','neoforge-26.2'})
@@ -33,6 +52,17 @@ class WorkspaceTests(unittest.TestCase):
                     self.assertEqual((output/'resources'/icon_path).read_bytes(), (root/'icon.png').read_bytes())
                     metadata = next(output.rglob('mcmod.info' if cfg['minecraft'] == '1.12.2' else 'neoforge.mods.toml' if cfg['loader'] == 'neoforge' else 'mods.toml'))
                     self.assertIn(icon_path, metadata.read_text())
+                    self.assertIn('openui_mc', metadata.read_text())
+                    if cfg['minecraft'] != '1.12.2':
+                        self.assertIn(f'versionRange="[{props["openui_version"]},)"', metadata.read_text())
+                    materials=output/'resources'/f"assets/{props['mod_id']}/textures/block"
+                    for name in ('steel','casing','vent','circuit'):
+                        image=(materials/(name+'.png')).read_bytes()
+                        self.assertEqual(image[:8],b'\x89PNG\r\n\x1a\n')
+                        self.assertEqual((int.from_bytes(image[16:20],'big'),int.from_bytes(image[20:24],'big')),(16,16))
+                    block_model=json.loads((output/'resources'/f"assets/{props['mod_id']}/models/block/repair_station.json").read_text())
+                    for element in block_model['elements']:
+                        self.assertTrue(all(0<=a<b<=16 for a,b in zip(element['from'],element['to'])))
                     files = list(output.rglob('repair_station.json'))
                     recipe = next(json.loads(f.read_text()) for f in files if f.parent.name in ('recipe','recipes'))
                     recipe_root = 'assets' if cfg['minecraft'] == '1.12.2' else 'data'
@@ -76,7 +106,7 @@ class WorkspaceTests(unittest.TestCase):
     def test_no_production_dependencies_on_dev_mods(self):
         for target,cfg in release.TARGETS.items():
             plan = release.metadata(cfg,'alpha','notes')
-            self.assertEqual(plan['relations'],{'projects':[]})
+            self.assertEqual(plan['relations'],{'projects':[{'slug':'openui-mc','type':'requiredDependency'}]})
             self.assertEqual(plan['releaseType'],'alpha')
 
     def test_dev_lock_has_jei_and_records_powah_gaps(self):
@@ -85,6 +115,8 @@ class WorkspaceTests(unittest.TestCase):
             self.assertTrue(any(d['project']=='jei' for d in lock[target]['dependencies']))
             if target in ('forge-1.12.2','neoforge-26.2'):
                 self.assertTrue(lock[target]['unavailable'])
+                fallback = 'solar-flux-reborn' if target == 'forge-1.12.2' else 'energized-power'
+                self.assertTrue(any(d['project']==fallback for d in lock[target]['dependencies']))
             else:
                 self.assertTrue(any(d['project']=='powah' for d in lock[target]['dependencies']))
 

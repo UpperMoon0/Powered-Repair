@@ -27,11 +27,13 @@ def inspect(target, jar=None):
     with zipfile.ZipFile(jar) as z:
         names = set(z.namelist())
         required = {'com/nstut/repair/core/RepairEngine.class', 'com/nstut/repair/core/RepairSettings.class',
-                    'com/nstut/repair/core/EnergyBuffer.class', 'com/nstut/repair/RepairMod.class'}
+                    'com/nstut/repair/core/EnergyBuffer.class', 'com/nstut/repair/RepairMod.class',
+                    'com/nstut/repair/RepairMenu.class','com/nstut/repair/RepairScreen.class'}
         cfg = TARGETS[target]
         metadata = 'mcmod.info' if cfg['minecraft'] == '1.12.2' else 'META-INF/neoforge.mods.toml' if cfg['loader'] == 'neoforge' else 'META-INF/mods.toml'
         icon_path = f"assets/{p['mod_id']}/icon.png"
         required |= {metadata, f"assets/{p['mod_id']}/blockstates/repair_station.json", icon_path}
+        required |= {f"assets/{p['mod_id']}/textures/block/{material}.png" for material in ('steel','casing','vent','circuit')}
         if not required <= names:
             raise ValueError(f'{target}: missing {sorted(required - names)}')
         text = z.read(metadata).decode()
@@ -39,9 +41,20 @@ def inspect(target, jar=None):
             raise ValueError('Invalid packaged identity/version')
         if icon_path not in text or z.read(icon_path) != (ROOT/'icon.png').read_bytes():
             raise ValueError('Missing icon metadata or outdated packaged icon')
+        if 'openui_mc' not in text:
+            raise ValueError('Missing OpenUI client dependency')
+        for material in ('steel','casing','vent','circuit'):
+            image=z.read(f"assets/{p['mod_id']}/textures/block/{material}.png")
+            if image[:8] != b'\x89PNG\r\n\x1a\n' or int.from_bytes(image[16:20],'big') != 16 or int.from_bytes(image[20:24],'big') != 16:
+                raise ValueError('Block textures must be 16x16 PNGs')
+        from model_validation import validate_model
+        block_model=json.loads(z.read(f"assets/{p['mod_id']}/models/block/repair_station.json"))
+        validate_model(block_model,{f"{p['mod_id']}:block/{m}":(16,16) for m in ('steel','casing','vent','circuit')})
         limit = {8:52,17:61,21:65,25:69}[cfg['java']]
         for name in names:
             if name.endswith('.class'):
+                if name.startswith('com/nstut/repair/preview/'):
+                    raise ValueError('Development preview leaked into production JAR')
                 if not name.startswith('com/nstut/repair/'):
                     raise ValueError('Unexpected bundled dependency: ' + name)
                 if int.from_bytes(z.read(name)[6:8], 'big') > limit:
@@ -84,7 +97,7 @@ def metadata(cfg, release_type, changelog):
             'displayName':f"{p['mod_name']} {p['mod_version']} - {cfg['loader'].title().replace('Neoforge','NeoForge')} {cfg['minecraft']}",
             'releaseType':release_type,
             'gameVersionNames':[cfg['minecraft'], 'Forge' if cfg['loader']=='forge' else 'NeoForge'],
-            'relations':{'projects':[]}}
+            'relations':{'projects':[{'slug':'openui-mc','type':'requiredDependency'}]}}
 
 def multipart(meta, jar):
     boundary = 'powered-repair-' + uuid.uuid4().hex

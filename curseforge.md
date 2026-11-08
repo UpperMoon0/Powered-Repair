@@ -5,6 +5,8 @@
 ## Features
 
 - **Five equipment slots:** repair tools, weapons, armor and other eligible equipment, with work rotating fairly between damaged items.
+- **A dedicated repair workbench:** a custom model with 16×16 steel, teal casing, vent and circuit textures, plus a Powered Repair creative tab.
+- **A clear OpenUI screen:** full player inventory and hotbar, shift-click transfers, repair status, and a live energy gauge with detailed tooltips.
 - **Energy-powered repairs:** configurable energy cost, repair speed and internal energy storage.
 - **Keep your gear's identity:** repairs preserve names, enchantments and other item data; only durability damage changes.
 - **Automate the process:** hoppers and compatible item pipes can insert damaged equipment and extract fully repaired items.
@@ -44,7 +46,7 @@ Choose the file matching your Minecraft version and loader. Install the matching
 
 ## Dependencies and Compatibility
 
-Powered Repair requires its matching Forge or NeoForge loader. **JEI and Powah are optional**, and neither is bundled with the mod. Supply power from a mod that exposes the energy API supported by your chosen loader version.
+Powered Repair requires its matching Forge or NeoForge loader and **OpenUI MC 0.0.16 or newer on clients (no upper version limit)**, matching the Minecraft version and loader. Dedicated servers do not need OpenUI. **JEI and Powah are optional**, and neither is bundled with the mod. Supply power from a mod that exposes the energy API supported by your chosen loader version.
 
 Standard durability is the compatibility boundary: a modded item looking damaged does not guarantee it uses that system. Equipment powered by charge or a separate custom durability mechanic is not automatically supported. Specific cable networks and client visuals have not yet been verified; see the [verification record](https://github.com/UpperMoon0/Powered-Repair/blob/main/VERIFICATION.md) for the current test coverage.
 
