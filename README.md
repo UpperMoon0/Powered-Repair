@@ -65,15 +65,12 @@ Use `gradlew.bat` on Windows. `tools/build.py` honors `JAVA_HOME_8_X64`, `JAVA_H
 
 ## CI and releases
 
-Every push and pull request runs shared tests, cross-version resource/package checks, and builds all six loader artifacts. Each target also runs native server acceptance checks with the locked development utilities: capability lookup, simulation/rollback, repair cost, redstone pause, item data preservation, saved-block reload, and extraction after completion. Release tags use `v<mod_version>` and must match `gradle.properties`. The release workflow waits for the full build matrix before creating a draft GitHub release and uploading to CurseForge. It publishes the GitHub release after all six CurseForge uploads return confirmed file IDs.
+Jenkins orchestration and release publication are centralized in [NsTut-CICD](https://github.com/UpperMoon0/NsTut-CICD). The repository's Jenkinsfile delegates to `nstutPoweredRepair()`. The portable runner selects a capacity-ready native worker with verified Java 8/17/21/25 toolchains; both Windows and Linux launchers are supported, with isolated Gradle caches. Reviewed main builds run shared tests, cross-version resource/package checks and all six native server acceptance probes, preserving verified production JARs separately from development test builds.
 
-Before the first release:
+The CurseForge project is **1791835** ([author dashboard](https://authors.curseforge.com/#/projects/1791835/files)). The final mod identity is `powered_repair` / Powered Repair. OpenUI is a required CurseForge relation; development utilities are excluded.
 
-1. Set `mod_id`, `mod_name` and `identity_final=true` in `gradle.properties`.
-2. Create the CurseForge mod project and set repository variable `CURSEFORGE_PROJECT_ID` to its numeric ID.
-3. Configure repository secret `CURSEFORGE_API_TOKEN`.
-4. Add versioned notes under `changelog/<mod_version>.md`, then push a matching version tag.
+Publication requires a reviewed request in `jenkins/artifacts/mod-releases.json` in NsTut-CICD: the exact source SHA, successful Jenkins build number, version and release channel. Ordinary pushes and tags do not publish. The host verifies broker success, all six accepted artifact hashes, source identity/version and versioned changelog before creating a GitHub draft and uploading the matching files to CurseForge. It makes the GitHub release public after all six uploads return confirmed IDs.
 
-Release uploads default to alpha. The workflow supports alpha, beta and release for manual runs on a version tag. Upload receipts and SHA-256 hashes are kept with the draft release. A retry skips confirmed uploads and refuses to repeat an upload whose outcome is uncertain.
+The publishing token comes from `nstutcommonkv/curseforge-api-token`, never build agents or repository files. SHA-256 checksums and durable per-file receipts support recovery; an uncertain upload blocks retries until inspected. See the centralized [release guide](https://github.com/UpperMoon0/NsTut-CICD/blob/main/jenkins/minecraft-mods/powered-repair/README.md). No files have been published by this setup change.
 
 Compilation and CI results do not establish visual quality or third-party runtime compatibility. Native client checks are tracked separately in the repository's verification notes.

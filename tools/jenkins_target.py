@@ -7,21 +7,22 @@ import shutil
 import subprocess
 import sys
 from release import ROOT, TARGETS, filename, inspect
+from jenkins_runtime import environment, gradle
 
 
 def main(target):
     if target not in TARGETS:
         raise ValueError('Unknown native target')
-    subprocess.run(['./gradlew', 'build', '-PdevMods=false', '--no-daemon', '--max-workers=1', '--console=plain'],
-                   cwd=ROOT / target, check=True)
+    env = environment(target)
+    gradle(target, ['build', '-PdevMods=false'], env)
     manifest = inspect(target)
     destination = ROOT / 'ci-production' / target
     destination.mkdir(parents=True)
     jar = destination / filename(target)
     shutil.copyfile(ROOT / target / 'build/libs' / filename(target), jar)
-    environment = dict(os.environ, DEV_SMOKE='true')
+    smoke_environment = dict(env, DEV_SMOKE='true')
     subprocess.run([sys.executable, str(ROOT / 'tools/smoke.py'), target],
-                   cwd=ROOT, env=environment, check=True)
+                   cwd=ROOT, env=smoke_environment, check=True)
     if inspect(target, jar) != manifest:
         raise ValueError('Production snapshot changed during native acceptance')
     sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()

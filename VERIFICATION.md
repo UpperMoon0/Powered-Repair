@@ -1,5 +1,11 @@
 # Verification record
 
+Central release integration on 2026-11-08:
+
+- Confirmed CurseForge project 1791835 in the author dashboard; project moderation is pending and no files have been uploaded. Finalized the existing Powered Repair identity.
+- Replaced repository-owned Actions build/release workflows with the centralized `nstutPoweredRepair()` Jenkins delegate. Removed the local publishing implementation; production package inspection remains available.
+- All 14 repository checks and the shared Gradle repair tests passed with the native Windows CI runtime and build-local toolchain configuration. Launcher tests cover Windows/Linux selection and pinned Jenkins JDK variables. Central release tests cover complete six-target bundles, tampering, unknown CF versions, confirmed-upload recovery, uncertain POST blocking, and exact build/SHA selection. No publication request is enabled.
+
 UI copy and dependency-range cleanup on 2026-11-08:
 
 - Removed the fill percentage and per-point energy cost from the energy tooltip, and removed the sidebar's Shift-click hint. Transfer behavior is unchanged.

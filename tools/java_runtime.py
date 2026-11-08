@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 
 def java_home(major, env):
-    explicit = env.get(f'JAVA_HOME_{major}_X64') or env.get(f'JAVA{major}_HOME')
+    explicit = env.get(f'JAVA_HOME_{major}_X64') or env.get(f'JAVA_HOME_{major}') or env.get(f'JAVA{major}_HOME')
     if explicit:
         return explicit
     candidates = []
