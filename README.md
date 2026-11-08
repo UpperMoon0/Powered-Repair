@@ -65,7 +65,7 @@ Use `gradlew.bat` on Windows. `tools/build.py` honors `JAVA_HOME_8_X64`, `JAVA_H
 
 ## CI and releases
 
-Jenkins orchestration and release publication are centralized in [NsTut-CICD](https://github.com/UpperMoon0/NsTut-CICD). The repository's Jenkinsfile delegates to `nstutPoweredRepair()`. Reviewed main builds run shared tests, cross-version resource/package checks and all six native server acceptance probes, preserving verified production JARs separately from development test builds.
+Jenkins orchestration and release publication are centralized in [NsTut-CICD](https://github.com/UpperMoon0/NsTut-CICD). The repository's Jenkinsfile delegates to `nstutPoweredRepair()`. The portable runner selects a capacity-ready native worker with verified Java 8/17/21/25 toolchains; both Windows and Linux launchers are supported, with isolated Gradle caches. Reviewed main builds run shared tests, cross-version resource/package checks and all six native server acceptance probes, preserving verified production JARs separately from development test builds.
 
 The CurseForge project is **1791835** ([author dashboard](https://authors.curseforge.com/#/projects/1791835/files)). The final mod identity is `powered_repair` / Powered Repair. OpenUI is a required CurseForge relation; development utilities are excluded.
 
