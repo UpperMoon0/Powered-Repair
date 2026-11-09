@@ -6,20 +6,10 @@ A Minecraft mod that repairs damaged equipment using energy. The **Repair Statio
 
 ## How it works
 
-1. Craft a Repair Station using the recipe below.
+1. Craft a Repair Station (use JEI to look up its recipe).
 2. Place it and connect a compatible energy source to any side.
 3. Open the station and insert damaged tools, weapons, or armor.
 4. Take the repaired items out, or use a hopper or compatible pipe to automate input and output.
-
-```text
-I B I
-R A R
-I B I
-```
-
-`I` = iron ingot, `B` = Mending I enchanted book, `R` = redstone dust, `A` = anvil.
-
-Both books must have Mending. For Forge 1.12.2 and 1.16.5, use unrenamed books with only Mending because those recipes require exact item data.
 
 By default, the station stores **100,000 energy**, consumes **100 energy per durability point**, and restores **one point per tick across all five slots**. It rotates between damaged items so one item does not take all the repairs. Repairing changes only durability; enchantments, custom names, and other item data remain unchanged.
 

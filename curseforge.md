@@ -15,17 +15,7 @@ Items using custom charge or durability mechanics are not automatically supporte
 
 ## Getting started
 
-Craft a Repair Station using this pattern:
-
-```text
-Iron Ingot   Mending I Book   Iron Ingot
-Redstone     Anvil            Redstone
-Iron Ingot   Mending I Book   Iron Ingot
-```
-
-The recipe requires **4 iron ingots, 2 redstone dust, 1 anvil, and 2 Mending I enchanted books**. Both books must have Mending; ordinary books will not work. For Forge 1.12.2 and 1.16.5, use unrenamed Mending-only books because those recipes check exact item data.
-
-Place the station, supply energy through any side, and right-click it to insert damaged gear. You can take items out at any time. Hoppers or compatible pipes can automate loading and unloading; automated extraction waits until an item is fully repaired.
+Craft a Repair Station, place it, supply energy through any side, and right-click it to insert damaged gear. You can take items out at any time. Hoppers or compatible pipes can automate loading and unloading; automated extraction waits until an item is fully repaired.
 
 The station receives energy but does **not** send power to other blocks. It keeps its stored items and energy when the world is saved. Breaking the station drops the stored items, but loses the stored energy.
 
