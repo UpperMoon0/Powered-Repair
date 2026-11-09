@@ -46,6 +46,6 @@ The blacklist takes priority over the whitelist.
 
 ## Support
 
-[Report an issue](https://github.com/UpperMoon0/Powered-Repair/issues) · [Source code](https://github.com/UpperMoon0/Powered-Repair)
+[Join our Discord](https://discord.gg/bHyCQ2d6A) · [Report an issue](https://github.com/UpperMoon0/Powered-Repair/issues) · [Source code](https://github.com/UpperMoon0/Powered-Repair)
 
 Made by NsTut.
