@@ -1,5 +1,11 @@
 # Verification record
 
+Release and documentation status on 2026-11-09:
+
+- Powered Repair 0.1.0 was published with six confirmed CurseForge file IDs and six GitHub release JARs. CurseForge release-type metadata was corrected in place from Alpha to Release without uploading new JARs. The GitHub release is also marked as a normal release.
+- The current CurseForge description, repository README, release notes and generated mod description have been aligned around gameplay and requirements. These source documentation changes do not alter the already-published JAR bytes. The updated in-game description appears only in a subsequent built release.
+- Historical notes below describe verification and project status at the time of those checks, not the present publication state.
+
 Release candidate 0.1.0 on 2026-11-08:
 
 - Reviewed current main and the latest live CI failure: vanilla asset download preparation timed out on Forge 1.12.2 before native server acceptance. Added three bounded attempts for that download-only task; compilation, gameplay and native probe failures are never retried or hidden.
@@ -75,4 +81,4 @@ The Forge 1.12.2 development launcher uses the pinned MCP merge helper from Simp
 
 The original baseline used Minecraft's five-slot hopper screen; the custom OpenUI screen above supersedes it. A real Powah cable network remains outside the automated probes, which exercise the loader energy capability directly.
 
-CurseForge publishing is configured but has not been executed. Final mod identity, CurseForge project ID and upload credentials are still required. Workflow checks are visible under [GitHub Actions](https://github.com/UpperMoon0/Powered-Repair/actions).
+For current release files, see [v0.1.0](https://github.com/UpperMoon0/Powered-Repair/releases/tag/v0.1.0). Release orchestration and publication checks are maintained in [NsTut-CICD](https://github.com/UpperMoon0/NsTut-CICD).
