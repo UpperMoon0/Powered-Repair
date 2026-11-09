@@ -52,6 +52,7 @@ class WorkspaceTests(unittest.TestCase):
                     self.assertEqual((output/'resources'/icon_path).read_bytes(), (root/'icon.png').read_bytes())
                     metadata = next(output.rglob('mcmod.info' if cfg['minecraft'] == '1.12.2' else 'neoforge.mods.toml' if cfg['loader'] == 'neoforge' else 'mods.toml'))
                     self.assertIn(icon_path, metadata.read_text())
+                    self.assertIn(props['mod_description'], metadata.read_text())
                     self.assertIn('openui_mc', metadata.read_text())
                     if cfg['minecraft'] != '1.12.2':
                         self.assertIn(f'versionRange="[{props["openui_version"]},)"', metadata.read_text())
