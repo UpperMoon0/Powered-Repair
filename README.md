@@ -1,14 +1,15 @@
-# Powered Repair (working name)
+# Powered Repair
 
-A small mod focused on one machine: an energy-powered equipment repair station.
+A Minecraft mod that repairs damaged equipment using energy. The **Repair Station** has five slots, supports item automation, and can be paused with redstone.
 
-The project name and `powered_repair` ID are temporary. Set the final identity in `gradle.properties` before making a release. No releases are published while `identity_final=false`.
+[CurseForge description](curseforge.md) · [GitHub releases](https://github.com/UpperMoon0/Powered-Repair/releases) · [Issues](https://github.com/UpperMoon0/Powered-Repair/issues)
 
-The shared mod and CurseForge icon is [`icon.png`](icon.png). The generator packages it in every loader's assets and references it from the mod metadata. The ready-to-copy CurseForge front page is [`curseforge.md`](curseforge.md).
+## How it works
 
-## Gameplay
-
-Craft the station with four iron ingots, two redstone dust, an anvil, and two Mending I enchanted books:
+1. Craft a Repair Station using the recipe below.
+2. Place it and connect a compatible energy source to any side.
+3. Open the station and insert damaged tools, weapons, or armor.
+4. Take the repaired items out, or use a hopper or compatible pipe to automate input and output.
 
 ```text
 I B I
@@ -16,61 +17,79 @@ R A R
 I B I
 ```
 
-`I` = iron ingot, `R` = redstone dust, `A` = anvil, `B` = Mending I enchanted book.
-Ordinary books and books without Mending do not work. Use books containing only Mending
-for compatibility with every supported version; Forge 1.12.2 and 1.16.5 require exact book NBT.
+`I` = iron ingot, `B` = Mending I enchanted book, `R` = redstone dust, `A` = anvil.
 
-Connect an energy source and right-click the station to open its five equipment slots. It restores one durability point per tick for 100 energy by default, sharing work fairly between damaged items. Names, enchantments and other item data are preserved: only damage changes. A redstone signal pauses repairs. The machine receives energy on every face and does not supply energy to other blocks.
+Both books must have Mending. For Forge 1.12.2 and 1.16.5, use unrenamed books with only Mending because those recipes require exact item data.
 
-Hoppers and compatible pipes insert damaged equipment and extract repaired items. Players can remove items at any time. Breaking the station drops its contents; stored energy is lost. Equipment using nonstandard durability systems may require an integration and can be excluded through the blacklist.
+By default, the station stores **100,000 energy**, consumes **100 energy per durability point**, and restores **one point per tick across all five slots**. It rotates between damaged items so one item does not take all the repairs. Repairing changes only durability; enchantments, custom names, and other item data remain unchanged.
 
-The station has a custom, player-facing workbench model with four 16×16 materials and its own **Powered Repair** creative tab. Its OpenUI screen provides five real repair slots, the full player inventory and hotbar, shift-click transfers, live repair status, and an energy gauge with a live tooltip showing stored energy, capacity, repair speed and input faces. Existing repair rules and automation remain shared across all six versions.
+A redstone signal pauses repairs. Hoppers and compatible pipes can insert damaged items, but automated extraction only takes fully repaired items. The station accepts energy from every face and does not output it. Its inventory and energy survive world reloads; breaking the block drops its items but loses its stored energy.
 
-Clients require **OpenUI MC 0.0.16 or newer (no upper version limit)**, matching their Minecraft version and loader. Development builds resolve the pinned 0.0.16 release automatically; OpenUI is not bundled in this mod's JAR. Dedicated servers do not need the client UI dependency.
+Only items using the standard Minecraft durability system are supported by default. Items with custom energy, charge, or damage systems need a separate integration.
 
-Settings are in `config/<mod_id>.properties`: `capacity`, `energyPerPoint`, `pointsPerTick`, `blacklist`, and `whitelist`. Restart after editing. An empty whitelist allows all otherwise eligible items. The blacklist takes priority.
+## Supported versions
 
-## Targets and development utilities
+| Loader | Minecraft | Game Java |
+| --- | --- | --- |
+| Forge | 1.12.2 | 8 |
+| Forge | 1.16.5 | 8 |
+| Forge | 1.20.1 | 17 |
+| NeoForge | 1.21.1 | 21 |
+| NeoForge | 26.1.2 | 25 |
+| NeoForge | 26.2 | 25 |
 
-| Module | Game Java | JEI | Powah |
-| --- | --- | --- | --- |
-| `forge-1.12.2` | 8 | Included in development | Solar Flux Reborn 12.4.11 instead |
-| `forge-1.16.5` | 8 | Included in development | 2.3.16 with Lollipop |
-| `forge-1.20.1` | 17 | Included in development | 5.0.11 |
-| `neoforge-1.21.1` | 21 | Included in development | 6.2.10 |
-| `neoforge-26.1.2` | 25 | Included in development | 7.0.4 alpha |
-| `neoforge-26.2` | 25 | Included in development | Energized Power 3.0.7 instead |
+Install the matching Powered Repair JAR on client and server.
 
-There are no Fabric targets. Every development environment includes JEI and a power-generation mod. Powah is used where compatible; Solar Flux Reborn supplies Forge 1.12.2 and Energized Power supplies NeoForge 26.2. These development utilities are never bundled or required by the shipped mod. Exact upstream files and transitive requirements are recorded in `dev-mods.lock.json`. Refresh deliberately with `python tools/lock_dev_mods.py`.
+**OpenUI MC 0.0.16+ is required on clients**, with a matching Minecraft version and loader. It is not bundled in Powered Repair; dedicated servers do not require the UI mod. JEI and Powah are optional. Supply energy through a mod compatible with your loader's energy API.
 
-## Workspace
+The development environments include JEI and a power-generation mod for testing. Where Powah is unavailable, Forge 1.12.2 uses Solar Flux Reborn and NeoForge 26.2 uses Energized Power. None of these test utilities are included in released JARs; see [`dev-mods.lock.json`](dev-mods.lock.json) for exact development dependencies. A working connection to every third-party cable network has not been tested.
 
-`common/` owns repair scheduling, filtering, settings and energy accounting in Java 8. All six modules compile those same sources. `tools/native_sources.py` and `templates/` contain the loader and Minecraft API adapters; generated code lives under each module's ignored `build/` directory. Recipes, models, translations and loader metadata are generated from the same identity and recipe definition by `tools/generate.py`.
+## Configuration
 
-Each loader module has its own Gradle wrapper so Forge 1.12.2 can retain Gradle 5/Java 8 without constraining modern NeoForge. Open the root and individual modules together in your IDE.
+Settings are stored in `config/powered_repair.properties`. Restart the game or server after editing.
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `capacity` | `100000` | Energy the station can store |
+| `energyPerPoint` | `100` | Energy used per durability point |
+| `pointsPerTick` | `1` | Total durability restored per tick |
+| `blacklist` | Empty | Comma-separated item IDs to exclude |
+| `whitelist` | Empty | Optional comma-separated item IDs to allow |
+
+An empty whitelist permits all normally repairable items; blacklisted IDs are always excluded. `capacity` must be at least `energyPerPoint`, and all three numeric settings must be positive.
+
+## Building and testing
+
+`common/` contains the shared repair engine, energy accounting, scheduling, and filters. Each Forge/NeoForge module compiles the same shared behavior with an adapter for its Minecraft version. Generated resources and mod metadata come from `gradle.properties`, `targets.json`, `tools/generate.py`, and `templates/`.
+
+Each loader module has its own Gradle wrapper. Use the module-specific JDK listed above; Forge 1.16.5 launches Gradle with Java 17 while targeting Java 8 for the game.
 
 ```sh
 # Shared behavior tests
 ./gradlew :common:test
-# Build one module or every module
+
+# Build one production target, or all six
 python tools/build.py forge-1.20.1
 python tools/build.py all
-# Development client, with JEI and compatible Powah enabled
+
+# Development client with test dependencies
 python tools/build.py neoforge-1.21.1 runClient
-# Eight real-client screen/model previews in an isolated copied test world
+
+# Native server acceptance for one version
+python tools/smoke.py forge-1.20.1
+
+# Isolated UI previews (NeoForge 1.21.1)
 python tools/preview.py
 ```
 
-Use `gradlew.bat` on Windows. `tools/build.py` honors `JAVA_HOME_8_X64`, `JAVA_HOME_17_X64`, `JAVA_HOME_21_X64` (or `JAVA8_HOME`, etc.) when switching Gradle launchers. Gradle toolchains provision the game compiler for modern modules. Forge 1.16.5 uses Java 17 for Gradle and Java 8 for the game. Pass `-PdevMods=false` directly to a module wrapper for a production-only dependency graph.
+On Windows, the root Gradle launcher is `gradlew.bat`. Build tools accept version-specific `JAVA_HOME_8_X64`, `JAVA_HOME_17_X64`, and `JAVA_HOME_21_X64` (or `JAVA8_HOME`-style alternatives). Use `-PdevMods=false` on an individual module wrapper to skip development utilities.
 
-## CI and releases
+For screenshots and model implementation details, see [the UI documentation](docs/station-design.md). For what has actually been tested, see [the verification record](VERIFICATION.md).
 
-Jenkins orchestration and release publication are centralized in [NsTut-CICD](https://github.com/UpperMoon0/NsTut-CICD). The repository's Jenkinsfile delegates to `nstutPoweredRepair()`. The portable runner selects a capacity-ready native worker with verified Java 8/17/21/25 toolchains; both Windows and Linux launchers are supported, with isolated Gradle caches. Reviewed main builds run shared tests, cross-version resource/package checks and all six native server acceptance probes, preserving verified production JARs separately from development test builds.
+## Releases
 
-The CurseForge project is **1791835** ([author dashboard](https://authors.curseforge.com/#/projects/1791835/files)). The final mod identity is `powered_repair` / Powered Repair. OpenUI is a required CurseForge relation; development utilities are excluded.
+Powered Repair `0.1.0` is available as a **Release** for six supported versions. [View the published JARs and checksums](https://github.com/UpperMoon0/Powered-Repair/releases/tag/v0.1.0).
 
-Publication requires a reviewed request in `jenkins/artifacts/mod-releases.json` in NsTut-CICD: the exact source SHA, successful Jenkins build number, version and release channel. Ordinary pushes and tags do not publish. The host verifies broker success, all six accepted artifact hashes, source identity/version and versioned changelog before creating a GitHub draft and uploading the matching files to CurseForge. It makes the GitHub release public after all six uploads return confirmed IDs.
+CI and publication are managed in [NsTut-CICD](https://github.com/UpperMoon0/NsTut-CICD). A reviewed release request pins the source commit, successful Jenkins build, version, and release channel. Publication checks the build and artifact hashes, then publishes the six corresponding files to CurseForge project **1791835** and GitHub. Builds do not publish just because a commit or tag appears.
 
-The publishing token comes from `nstutcommonkv/curseforge-api-token`, never build agents or repository files. SHA-256 checksums and durable per-file receipts support recovery; an uncertain upload blocks retries until inspected. See the centralized [release guide](https://github.com/UpperMoon0/NsTut-CICD/blob/main/jenkins/minecraft-mods/powered-repair/README.md). No files have been published by this setup change.
-
-Compilation and CI results do not establish visual quality or third-party runtime compatibility. Native client checks are tracked separately in the repository's verification notes.
+The publisher keeps per-file receipts and blocks duplicate uploads after an uncertain response. See the [release process](https://github.com/UpperMoon0/NsTut-CICD/blob/main/jenkins/minecraft-mods/releases.md) for maintenance details.
